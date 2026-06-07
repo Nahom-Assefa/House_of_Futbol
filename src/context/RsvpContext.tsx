@@ -25,24 +25,24 @@ export function RsvpProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase
-      .from('event_rsvps')
-      .select('*')
-      .order('rsvp_at', { ascending: false })
-      .then(({ data }) => {
-        if (data) setRsvps(data as EventRsvp[])
-        setLoading(false)
-      })
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { setLoading(false); return }
+      supabase
+        .from('event_rsvps')
+        .select('*')
+        .order('rsvp_at', { ascending: false })
+        .then(({ data }) => {
+          if (data) setRsvps(data as EventRsvp[])
+          setLoading(false)
+        })
+    })
   }, [])
 
   async function submitRsvp(payload: SubmitRsvpPayload) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('event_rsvps')
       .insert(payload)
-      .select()
-      .single()
     if (error) throw new Error(error.message)
-    if (data) setRsvps((prev) => [data as EventRsvp, ...prev])
   }
 
   return (

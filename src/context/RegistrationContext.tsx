@@ -26,24 +26,24 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase
-      .from('tournament_registrations')
-      .select('*')
-      .order('registered_at', { ascending: false })
-      .then(({ data }) => {
-        if (data) setRegistrations(data as TournamentRegistration[])
-        setLoading(false)
-      })
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { setLoading(false); return }
+      supabase
+        .from('tournament_registrations')
+        .select('*')
+        .order('registered_at', { ascending: false })
+        .then(({ data }) => {
+          if (data) setRegistrations(data as TournamentRegistration[])
+          setLoading(false)
+        })
+    })
   }, [])
 
   async function submitRegistration(payload: SubmitRegistrationPayload) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('tournament_registrations')
       .insert(payload)
-      .select()
-      .single()
     if (error) throw new Error(error.message)
-    if (data) setRegistrations((prev) => [data as TournamentRegistration, ...prev])
   }
 
   return (

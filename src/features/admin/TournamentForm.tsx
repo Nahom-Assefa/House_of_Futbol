@@ -27,7 +27,7 @@ import { GTK_ICONS, GTK_ICON_OPTIONS } from '../../utils/gtkIcons'
 const EMPTY_FORM = {
   name: '',
   description: '',
-  format: 'bracket' as TournamentFormat,
+  format: 'single-elimination' as TournamentFormat,
   mode: 'singles' as TournamentMode,
   max_players: 16,
   location: '',
@@ -217,7 +217,7 @@ export default function TournamentForm({ editingTournament, onCancelEdit }: Prop
               label="Format"
               onChange={(e) => handleChange('format', e.target.value as TournamentFormat)}
             >
-              <MenuItem value="bracket">Single Elimination</MenuItem>
+              <MenuItem value="single-elimination">Single Elimination</MenuItem>
               <MenuItem value="double-elimination">Double Elimination</MenuItem>
               <MenuItem value="round-robin">Round Robin</MenuItem>
               <MenuItem value="group-stage">Group Stage</MenuItem>

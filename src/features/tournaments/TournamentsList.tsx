@@ -8,14 +8,14 @@ import type { TournamentFormat } from '../../types'
 import { getEventStatus } from '../../utils/eventStatus'
 
 const formatColor: Record<TournamentFormat, 'warning' | 'info' | 'success'> = {
-  bracket: 'warning',
+  'single-elimination': 'warning',
   'double-elimination': 'warning',
   'round-robin': 'info',
   'group-stage': 'success',
 }
 
 const formatLabel: Record<TournamentFormat, string> = {
-  bracket: 'Single Elimination',
+  'single-elimination': 'Single Elimination',
   'double-elimination': 'Double Elimination',
   'round-robin': 'Round Robin',
   'group-stage': 'Group Stage',

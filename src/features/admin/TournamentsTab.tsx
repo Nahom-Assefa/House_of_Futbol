@@ -11,14 +11,14 @@ import { useTournaments } from '../../context/TournamentsContext'
 import type { Tournament, TournamentFormat, TournamentStatus } from '../../types'
 
 const FORMAT_LABEL: Record<TournamentFormat, string> = {
-  bracket: 'Single Elimination',
+  'single-elimination': 'Single Elimination',
   'double-elimination': 'Double Elimination',
   'round-robin': 'Round Robin',
   'group-stage': 'Group Stage',
 }
 
 const FORMAT_COLOR: Record<TournamentFormat, 'warning' | 'info' | 'success'> = {
-  bracket: 'warning',
+  'single-elimination': 'warning',
   'double-elimination': 'warning',
   'round-robin': 'info',
   'group-stage': 'success',
