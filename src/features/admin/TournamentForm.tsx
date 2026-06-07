@@ -62,6 +62,7 @@ export default function TournamentForm({ editingTournament, onCancelEdit }: Prop
   const [draftGTK, setDraftGTK] = useState(EMPTY_DRAFT_GTK)
   const [draftFAQ, setDraftFAQ] = useState(EMPTY_DRAFT_FAQ)
   const [success, setSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const isEditing = editingTournament != null
 
@@ -76,7 +77,7 @@ export default function TournamentForm({ editingTournament, onCancelEdit }: Prop
         location: editingTournament.location ?? '',
         time: editingTournament.time ?? '',
       })
-      setDate(dayjs(editingTournament.date))
+      setDate(dayjs(editingTournament.date + 'T00:00:00'))
       setGoodToKnow(editingTournament.good_to_know ?? [])
       setFaqs(editingTournament.faqs ?? [])
     } else {
@@ -117,6 +118,7 @@ export default function TournamentForm({ editingTournament, onCancelEdit }: Prop
 
   async function handleSubmit() {
     if (!isValid) return
+    setError(null)
     const payload: Omit<Tournament, 'id' | 'created_at' | 'status'> = {
       name: form.name.trim(),
       description: form.description.trim() || null,
@@ -129,18 +131,22 @@ export default function TournamentForm({ editingTournament, onCancelEdit }: Prop
       good_to_know: goodToKnow,
       faqs,
     }
-    if (isEditing) {
-      await updateTournament(editingTournament.id, { ...payload, status: editingTournament.status })
-      onCancelEdit?.()
-    } else {
-      await addTournament({ ...payload, status: 'upcoming' })
-      setForm(EMPTY_FORM)
-      setDate(null)
-      setGoodToKnow([])
-      setFaqs([])
-      setDraftGTK(EMPTY_DRAFT_GTK)
-      setDraftFAQ(EMPTY_DRAFT_FAQ)
-      setSuccess(true)
+    try {
+      if (isEditing) {
+        await updateTournament(editingTournament.id, { ...payload, status: editingTournament.status })
+        onCancelEdit?.()
+      } else {
+        await addTournament({ ...payload, status: 'upcoming' })
+        setForm(EMPTY_FORM)
+        setDate(null)
+        setGoodToKnow([])
+        setFaqs([])
+        setDraftGTK(EMPTY_DRAFT_GTK)
+        setDraftFAQ(EMPTY_DRAFT_FAQ)
+        setSuccess(true)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
     }
   }
 
@@ -211,7 +217,8 @@ export default function TournamentForm({ editingTournament, onCancelEdit }: Prop
               label="Format"
               onChange={(e) => handleChange('format', e.target.value as TournamentFormat)}
             >
-              <MenuItem value="bracket">Single Elimination (Bracket)</MenuItem>
+              <MenuItem value="bracket">Single Elimination</MenuItem>
+              <MenuItem value="double-elimination">Double Elimination</MenuItem>
               <MenuItem value="round-robin">Round Robin</MenuItem>
               <MenuItem value="group-stage">Group Stage</MenuItem>
             </Select>
@@ -397,6 +404,17 @@ export default function TournamentForm({ editingTournament, onCancelEdit }: Prop
       >
         <Alert severity="success" onClose={() => setSuccess(false)}>
           Tournament added successfully
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
         </Alert>
       </Snackbar>
     </Box>

@@ -11,13 +11,15 @@ import { useTournaments } from '../../context/TournamentsContext'
 import type { Tournament, TournamentFormat, TournamentStatus } from '../../types'
 
 const FORMAT_LABEL: Record<TournamentFormat, string> = {
-  bracket: 'Bracket',
+  bracket: 'Single Elimination',
+  'double-elimination': 'Double Elimination',
   'round-robin': 'Round Robin',
   'group-stage': 'Group Stage',
 }
 
 const FORMAT_COLOR: Record<TournamentFormat, 'warning' | 'info' | 'success'> = {
   bracket: 'warning',
+  'double-elimination': 'warning',
   'round-robin': 'info',
   'group-stage': 'success',
 }
@@ -94,7 +96,7 @@ export default function TournamentsTab() {
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">
-                      {new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {new Date(t.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'America/Chicago' })}
                     </Typography>
                   </TableCell>
                   <TableCell>

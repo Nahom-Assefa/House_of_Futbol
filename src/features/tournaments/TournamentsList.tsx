@@ -9,12 +9,14 @@ import { getEventStatus } from '../../utils/eventStatus'
 
 const formatColor: Record<TournamentFormat, 'warning' | 'info' | 'success'> = {
   bracket: 'warning',
+  'double-elimination': 'warning',
   'round-robin': 'info',
   'group-stage': 'success',
 }
 
 const formatLabel: Record<TournamentFormat, string> = {
   bracket: 'Single Elimination',
+  'double-elimination': 'Double Elimination',
   'round-robin': 'Round Robin',
   'group-stage': 'Group Stage',
 }
@@ -84,7 +86,7 @@ export default function TournamentsList() {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <CalendarMonthIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                     <Typography variant="caption" color="text.secondary">
-                      {new Date(t.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                      {new Date(t.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/Chicago' })}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

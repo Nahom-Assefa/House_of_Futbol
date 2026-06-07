@@ -27,18 +27,21 @@ const statusGradient: Record<'upcoming' | 'completed', string> = {
 
 const formatLabel: Record<TournamentFormat, string> = {
   bracket: 'Single Elimination',
+  'double-elimination': 'Double Elimination',
   'round-robin': 'Round Robin',
   'group-stage': 'Group Stage',
 }
 
 const formatColor: Record<TournamentFormat, 'warning' | 'info' | 'success'> = {
   bracket: 'warning',
+  'double-elimination': 'warning',
   'round-robin': 'info',
   'group-stage': 'success',
 }
 
 const formatDescription: Record<TournamentFormat, string> = {
   bracket: 'Win or go home. Each match is single elimination — one loss and your run is over. The last player/team standing wins.',
+  'double-elimination': 'Two lives. Lose once and you drop to the losers bracket — fight back or you\'re done. Win that and you\'re back in the final.',
   'round-robin': 'Everyone plays everyone. Points accumulate across matches, and the top performer at the end wins the cup.',
   'group-stage': 'Teams are divided into groups. Top performers from each group advance to knockout rounds.',
 }
@@ -63,9 +66,9 @@ export default function TournamentDetailView() {
     )
   }
 
-  const tournamentDate = new Date(t.date)
+  const tournamentDate = new Date(t.date + 'T00:00:00')
   const formattedDate = tournamentDate.toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/Chicago',
   })
   const { status, color } = getEventStatus(t.date)
 

@@ -105,7 +105,7 @@ export default function CommunityEvents() {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <CalendarMonthIcon sx={{ fontSize: 15, color: 'text.secondary' }} />
                         <Typography variant="caption" color="text.secondary">
-                          {new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                          {new Date(event.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/Chicago' })}
                         </Typography>
                       </Box>
                       {event.location && (

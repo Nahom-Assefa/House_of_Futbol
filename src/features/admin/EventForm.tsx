@@ -80,7 +80,7 @@ export default function EventForm({ editingEvent, onCancelEdit }: Props) {
         location: editingEvent.location ?? '',
         time: editingEvent.time ?? '',
       })
-      setDate(dayjs(editingEvent.date))
+      setDate(dayjs(editingEvent.date + 'T00:00:00'))
       setGoodToKnow(editingEvent.good_to_know ?? [])
       setFaqs(editingEvent.faqs ?? [])
     } else {

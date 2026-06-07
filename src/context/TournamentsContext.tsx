@@ -29,21 +29,23 @@ export function TournamentsProvider({ children }: { children: ReactNode }) {
   }, [])
 
   async function addTournament(data: Omit<Tournament, 'id' | 'created_at'>) {
-    const { data: inserted } = await supabase
+    const { data: inserted, error } = await supabase
       .from('tournaments')
       .insert(data)
       .select()
       .single()
+    if (error) throw new Error(error.message)
     if (inserted) setTournaments((prev) => [inserted as Tournament, ...prev])
   }
 
   async function updateTournament(id: string, data: Omit<Tournament, 'id' | 'created_at'>) {
-    const { data: updated } = await supabase
+    const { data: updated, error } = await supabase
       .from('tournaments')
       .update(data)
       .eq('id', id)
       .select()
       .single()
+    if (error) throw new Error(error.message)
     if (updated) {
       setTournaments((prev) => prev.map((t) => (t.id === id ? (updated as Tournament) : t)))
     }

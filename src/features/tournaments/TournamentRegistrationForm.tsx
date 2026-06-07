@@ -52,9 +52,9 @@ export default function TournamentRegistrationForm() {
     )
   }
 
-  const tournamentDate = new Date(tournament.date)
+  const tournamentDate = new Date(tournament.date + 'T00:00:00')
   const formattedDate = tournamentDate.toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/Chicago',
   })
 
   function validate(): boolean {

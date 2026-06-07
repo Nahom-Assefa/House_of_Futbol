@@ -65,9 +65,9 @@ export default function EventRsvpForm() {
     )
   }
 
-  const eventDate = new Date(event.date)
+  const eventDate = new Date(event.date + 'T00:00:00')
   const formattedDate = eventDate.toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/Chicago',
   })
 
   function validate(): boolean {

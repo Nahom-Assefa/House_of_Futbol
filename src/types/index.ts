@@ -5,7 +5,7 @@ export interface Profile {
   created_at: string
 }
 
-export type TournamentFormat = 'round-robin' | 'bracket' | 'group-stage'
+export type TournamentFormat = 'round-robin' | 'bracket' | 'double-elimination' | 'group-stage'
 export type TournamentStatus = 'upcoming' | 'active' | 'completed'
 export type TournamentMode = 'singles' | 'doubles'
 
