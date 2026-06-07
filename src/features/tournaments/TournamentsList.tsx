@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Box, Container, Typography, Grid2 as Grid, Paper, Chip, Button, Stack } from '@mui/material'
+import { Box, Container, Typography, Grid2 as Grid, Paper, Chip, Button, Stack, CircularProgress } from '@mui/material'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import GroupsIcon from '@mui/icons-material/Groups'
@@ -20,7 +20,7 @@ const formatLabel: Record<TournamentFormat, string> = {
 }
 
 export default function TournamentsList() {
-  const { tournaments } = useTournaments()
+  const { tournaments, loading } = useTournaments()
   const navigate = useNavigate()
 
   return (
@@ -36,6 +36,13 @@ export default function TournamentsList() {
           Compete, climb the ranks, and prove you're the best in the Twin Cities.
         </Typography>
 
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+            <CircularProgress />
+          </Box>
+        ) : tournaments.length === 0 ? (
+          <Typography color="text.secondary">No tournaments yet.</Typography>
+        ) : (
         <Grid container spacing={3}>
           {tournaments.map((t) => (
             <Grid size={{ xs: 12, md: 6 }} key={t.id}>
@@ -95,6 +102,7 @@ export default function TournamentsList() {
             </Grid>
           ))}
         </Grid>
+        )}
       </Container>
     </Box>
   )

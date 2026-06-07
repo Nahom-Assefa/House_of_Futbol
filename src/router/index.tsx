@@ -3,8 +3,10 @@ import App from '../App'
 import HomeView from '../features/home/HomeView'
 import TournamentsList from '../features/tournaments/TournamentsList'
 import TournamentDetailView from '../features/tournaments/TournamentDetailView'
+import TournamentRegistrationForm from '../features/tournaments/TournamentRegistrationForm'
 import CommunityEvents from '../features/community/CommunityEvents'
 import EventDetailView from '../features/community/EventDetailView'
+import EventRsvpForm from '../features/community/EventRsvpForm'
 import AuthForm from '../features/auth/AuthForm'
 import AdminLoginForm from '../features/auth/AdminLoginForm'
 import AdminDashboard from '../features/admin/AdminDashboard'
@@ -18,8 +20,10 @@ export const router = createBrowserRouter([
       { index: true, element: <HomeView /> },
       { path: 'tournaments', element: <TournamentsList /> },
       { path: 'tournaments/:id', element: <TournamentDetailView /> },
+      { path: 'tournaments/:id/register', element: <TournamentRegistrationForm /> },
       { path: 'community', element: <CommunityEvents /> },
       { path: 'community/:id', element: <EventDetailView /> },
+      { path: 'community/:id/rsvp', element: <EventRsvpForm /> },
       { path: 'auth', element: <AuthForm /> },
       { path: 'admin/login', element: <AdminLoginForm /> },
       {

@@ -46,7 +46,7 @@ export default function Header() {
               variant="h6"
               sx={{ color: 'white', fontFamily: 'Montserrat', fontWeight: 900, letterSpacing: '0.02em' }}
             >
-              House of Futbol
+              House of Fútbol
             </Typography>
           </Box>
 

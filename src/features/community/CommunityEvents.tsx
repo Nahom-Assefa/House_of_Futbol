@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Container, Typography, Grid2 as Grid, Paper, Chip, Button, Stack, ToggleButtonGroup, ToggleButton } from '@mui/material'
+import { Box, Container, Typography, Grid2 as Grid, Paper, Chip, Button, Stack, ToggleButtonGroup, ToggleButton, CircularProgress } from '@mui/material'
 import GroupsIcon from '@mui/icons-material/Groups'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
@@ -25,7 +25,7 @@ const eventTypeColor: Record<EventType, 'success' | 'secondary' | 'info' | 'erro
 }
 
 export default function CommunityEvents() {
-  const { events } = useEvents()
+  const { events, loading } = useEvents()
   const navigate = useNavigate()
   const [filter, setFilter] = useState<EventType | 'all'>('all')
 
@@ -41,7 +41,7 @@ export default function CommunityEvents() {
           </Typography>
         </Stack>
         <Typography color="text.secondary" mb={5}>
-          Gaming sessions, watch parties, and community meetups. Something for everyone.
+          Gaming sessions, watch parties, pick-up games, and community meetups. Something for everyone.
         </Typography>
 
         <ToggleButtonGroup
@@ -59,7 +59,11 @@ export default function CommunityEvents() {
           <ToggleButton value="other">Other</ToggleButton>
         </ToggleButtonGroup>
 
-        {filtered.length === 0 ? (
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+            <CircularProgress />
+          </Box>
+        ) : filtered.length === 0 ? (
           <Typography color="text.secondary">No events in this category yet.</Typography>
         ) : (
           <Grid container spacing={3}>

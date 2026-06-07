@@ -1,96 +1,61 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import type { Tournament } from '../types'
-
-const INITIAL_TOURNAMENTS: Tournament[] = [
-  {
-    id: '1',
-    name: 'Summer Showdown 2025',
-    date: '2025-07-12',
-    format: 'bracket',
-    mode: 'singles',
-    status: 'upcoming',
-    max_players: 16,
-    description: 'The biggest tournament of the summer. Single elimination, winner takes all.',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    name: 'Weekend Warrior Cup',
-    date: '2025-06-28',
-    format: 'round-robin',
-    mode: 'singles',
-    status: 'upcoming',
-    max_players: 8,
-    description: 'A casual round-robin to warm up for the summer. All skill levels welcome.',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    name: 'Diaspora Classic',
-    date: '2025-05-17',
-    format: 'group-stage',
-    mode: 'doubles',
-    status: 'completed',
-    max_players: 24,
-    description: 'Our inaugural tournament. A legendary day in House of Futbol history.',
-    created_at: new Date().toISOString(),
-  },
-]
-
-const STORAGE_KEY = 'hof_tournaments'
-
-function loadTournaments(): Tournament[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) return JSON.parse(stored) as Tournament[]
-  } catch {
-    // corrupted storage — fall back to defaults
-  }
-  return INITIAL_TOURNAMENTS
-}
-
-function saveTournaments(tournaments: Tournament[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tournaments))
-}
+import { supabase } from '../lib/supabase'
 
 interface TournamentsContextValue {
   tournaments: Tournament[]
-  addTournament: (data: Omit<Tournament, 'id' | 'created_at'>) => void
-  updateTournament: (id: string, data: Omit<Tournament, 'id' | 'created_at'>) => void
-  deleteTournament: (id: string) => void
+  loading: boolean
+  addTournament: (data: Omit<Tournament, 'id' | 'created_at'>) => Promise<void>
+  updateTournament: (id: string, data: Omit<Tournament, 'id' | 'created_at'>) => Promise<void>
+  deleteTournament: (id: string) => Promise<void>
 }
 
 const TournamentsContext = createContext<TournamentsContextValue | null>(null)
 
 export function TournamentsProvider({ children }: { children: ReactNode }) {
-  const [tournaments, setTournaments] = useState<Tournament[]>(loadTournaments)
+  const [tournaments, setTournaments] = useState<Tournament[]>([])
+  const [loading, setLoading] = useState(true)
 
-  function addTournament(data: Omit<Tournament, 'id' | 'created_at'>) {
-    const next = [
-      { ...data, id: crypto.randomUUID(), created_at: new Date().toISOString() },
-      ...tournaments,
-    ]
-    setTournaments(next)
-    saveTournaments(next)
+  useEffect(() => {
+    supabase
+      .from('tournaments')
+      .select('*')
+      .order('date', { ascending: true })
+      .then(({ data }) => {
+        if (data) setTournaments(data as Tournament[])
+        setLoading(false)
+      })
+  }, [])
+
+  async function addTournament(data: Omit<Tournament, 'id' | 'created_at'>) {
+    const { data: inserted } = await supabase
+      .from('tournaments')
+      .insert(data)
+      .select()
+      .single()
+    if (inserted) setTournaments((prev) => [inserted as Tournament, ...prev])
   }
 
-  function updateTournament(id: string, data: Omit<Tournament, 'id' | 'created_at'>) {
-    const next = tournaments.map((t) =>
-      t.id === id ? { ...t, ...data } : t
-    )
-    setTournaments(next)
-    saveTournaments(next)
+  async function updateTournament(id: string, data: Omit<Tournament, 'id' | 'created_at'>) {
+    const { data: updated } = await supabase
+      .from('tournaments')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single()
+    if (updated) {
+      setTournaments((prev) => prev.map((t) => (t.id === id ? (updated as Tournament) : t)))
+    }
   }
 
-  function deleteTournament(id: string) {
-    const next = tournaments.filter((t) => t.id !== id)
-    setTournaments(next)
-    saveTournaments(next)
+  async function deleteTournament(id: string) {
+    const { error } = await supabase.from('tournaments').delete().eq('id', id)
+    if (!error) setTournaments((prev) => prev.filter((t) => t.id !== id))
   }
 
   return (
-    <TournamentsContext.Provider value={{ tournaments, addTournament, updateTournament, deleteTournament }}>
+    <TournamentsContext.Provider value={{ tournaments, loading, addTournament, updateTournament, deleteTournament }}>
       {children}
     </TournamentsContext.Provider>
   )

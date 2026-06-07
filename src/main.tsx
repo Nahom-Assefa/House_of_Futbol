@@ -9,6 +9,8 @@ import { router } from './router'
 import { EventsProvider } from './context/EventsContext'
 import { TournamentsProvider } from './context/TournamentsContext'
 import { AuthProvider } from './context/AuthContext'
+import { RsvpProvider } from './context/RsvpContext'
+import { RegistrationProvider } from './context/RegistrationContext'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -18,7 +20,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <AuthProvider>
           <EventsProvider>
             <TournamentsProvider>
-              <RouterProvider router={router} />
+              <RsvpProvider>
+                <RegistrationProvider>
+                  <RouterProvider router={router} />
+                </RegistrationProvider>
+              </RsvpProvider>
             </TournamentsProvider>
           </EventsProvider>
         </AuthProvider>

@@ -18,10 +18,11 @@ const EVENT_TYPE_LABEL: Record<EventType, string> = {
   other: 'Other',
 }
 
-const EVENT_TYPE_COLOR: Record<EventType, 'success' | 'secondary' | 'info' | undefined> = {
+const EVENT_TYPE_COLOR: Record<EventType, 'success' | 'secondary' | 'info' | 'error' | undefined> = {
   gaming: 'success',
   watch_party: 'secondary',
   community: 'info',
+  pick_up: 'error',
   other: undefined,
 }
 

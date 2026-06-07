@@ -1,40 +1,39 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
-
-// DEV-ONLY: remove before production and replace with Supabase auth
-const DEV_CREDENTIALS = { username: 'Trane', password: 'asdfASDF1!' }
-
-const SESSION_KEY = 'hof_admin_auth'
+import type { Session } from '@supabase/supabase-js'
+import { supabase } from '../lib/supabase'
 
 interface AuthContextValue {
   isAuthenticated: boolean
-  login: (username: string, password: string) => boolean
-  logout: () => void
+  loading: boolean
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => sessionStorage.getItem(SESSION_KEY) === 'true'
-  )
+  const [session, setSession] = useState<Session | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  function login(username: string, password: string): boolean {
-    if (username === DEV_CREDENTIALS.username && password === DEV_CREDENTIALS.password) {
-      setIsAuthenticated(true)
-      sessionStorage.setItem(SESSION_KEY, 'true')
-      return true
-    }
-    return false
-  }
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setLoading(false)
+    })
 
-  function logout() {
-    setIsAuthenticated(false)
-    sessionStorage.removeItem(SESSION_KEY)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  async function logout() {
+    await supabase.auth.signOut()
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated: session !== null, loading, logout }}>
       {children}
     </AuthContext.Provider>
   )

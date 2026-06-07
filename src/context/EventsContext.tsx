@@ -1,105 +1,61 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import type { ClubEvent } from '../types'
-
-const INITIAL_EVENTS: ClubEvent[] = [
-  {
-    id: '1',
-    title: 'AFCON 2025 Watch Party',
-    description: 'Quarter-final watch party. Big screen, vibes, food. Come through.',
-    event_type: 'watch_party',
-    date: '2025-07-05',
-    location: 'House of Futbol HQ, Minneapolis',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    title: 'Weekly FIFA Session',
-    description: 'Open gaming night every Friday. Ranked friendlies and casual play all night.',
-    event_type: 'gaming',
-    date: '2025-06-27',
-    location: 'House of Futbol HQ',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    title: 'EPL Matchday: Man City vs Arsenal',
-    description: "Title race decider. We're watching it live and it's going to be loud.",
-    event_type: 'watch_party',
-    date: '2025-06-22',
-    location: 'House of Futbol HQ',
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    title: 'Twin Cities Futbol Mixer',
-    description: 'Meet people from the community. No controllers required — just good energy.',
-    event_type: 'community',
-    date: '2025-07-18',
-    location: 'Minneapolis Community Center',
-    created_at: new Date().toISOString(),
-  },
-]
+import { supabase } from '../lib/supabase'
 
 interface EventsContextValue {
   events: ClubEvent[]
-  addEvent: (event: Omit<ClubEvent, 'id' | 'created_at'>) => void
-  updateEvent: (id: string, data: Omit<ClubEvent, 'id' | 'created_at'>) => void
-  deleteEvent: (id: string) => void
-}
-
-const STORAGE_KEY = 'hof_events'
-
-function loadEvents(): ClubEvent[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) return JSON.parse(stored) as ClubEvent[]
-  } catch {
-    // corrupted storage — fall back to defaults
-  }
-  return INITIAL_EVENTS
-}
-
-function saveEvents(events: ClubEvent[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(events))
+  loading: boolean
+  addEvent: (data: Omit<ClubEvent, 'id' | 'created_at'>) => Promise<void>
+  updateEvent: (id: string, data: Omit<ClubEvent, 'id' | 'created_at'>) => Promise<void>
+  deleteEvent: (id: string) => Promise<void>
 }
 
 const EventsContext = createContext<EventsContextValue | null>(null)
 
 export function EventsProvider({ children }: { children: ReactNode }) {
-  const [events, setEvents] = useState<ClubEvent[]>(loadEvents)
+  const [events, setEvents] = useState<ClubEvent[]>([])
+  const [loading, setLoading] = useState(true)
 
-  function addEvent(data: Omit<ClubEvent, 'id' | 'created_at'>) {
-    const newEvent: ClubEvent = {
-      ...data,
-      id: crypto.randomUUID(),
-      created_at: new Date().toISOString(),
+  useEffect(() => {
+    supabase
+      .from('events')
+      .select('*')
+      .order('date', { ascending: true })
+      .then(({ data }) => {
+        if (data) setEvents(data as ClubEvent[])
+        setLoading(false)
+      })
+  }, [])
+
+  async function addEvent(data: Omit<ClubEvent, 'id' | 'created_at'>) {
+    const { data: inserted } = await supabase
+      .from('events')
+      .insert(data)
+      .select()
+      .single()
+    if (inserted) setEvents((prev) => [inserted as ClubEvent, ...prev])
+  }
+
+  async function updateEvent(id: string, data: Omit<ClubEvent, 'id' | 'created_at'>) {
+    const { data: updated } = await supabase
+      .from('events')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single()
+    if (updated) {
+      setEvents((prev) => prev.map((e) => (e.id === id ? (updated as ClubEvent) : e)))
     }
-    setEvents((prev) => {
-      const next = [newEvent, ...prev]
-      saveEvents(next)
-      return next
-    })
   }
 
-  function updateEvent(id: string, data: Omit<ClubEvent, 'id' | 'created_at'>) {
-    setEvents((prev) => {
-      const next = prev.map((e) => (e.id === id ? { ...e, ...data } : e))
-      saveEvents(next)
-      return next
-    })
-  }
-
-  function deleteEvent(id: string) {
-    setEvents((prev) => {
-      const next = prev.filter((e) => e.id !== id)
-      saveEvents(next)
-      return next
-    })
+  async function deleteEvent(id: string) {
+    const { error } = await supabase.from('events').delete().eq('id', id)
+    if (!error) setEvents((prev) => prev.filter((e) => e.id !== id))
   }
 
   return (
-    <EventsContext.Provider value={{ events, addEvent, updateEvent, deleteEvent }}>
+    <EventsContext.Provider value={{ events, loading, addEvent, updateEvent, deleteEvent }}>
       {children}
     </EventsContext.Provider>
   )

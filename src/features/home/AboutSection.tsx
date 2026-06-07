@@ -17,13 +17,13 @@ export default function AboutSection() {
               <br />for the community
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.9 }}>
-              House of Futbol was born from a simple idea: African diaspora communities in the Twin Cities
+              House of Fútbol was born from a simple idea: diaspora communities in the Twin Cities
               deserve a space that's truly theirs. A place to play FIFA the way it was meant — with people
-              who share the passion, the culture, and the banter.
+              who share the passion, the culture, and the rivalry.
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.9 }}>
               We believe in the power of in-person connection. Not just online matches — real moments,
-              real competition, real community. Whether you're a FIFA veteran or just vibing, you belong here.
+              real competition, real community. Whether you're a fútbol veteran or just vibing, you belong here.
             </Typography>
           </Grid>
 

@@ -23,7 +23,7 @@ export default function Footer() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <SportsSoccerIcon sx={{ color: 'primary.main' }} />
             <Typography variant="h6" sx={{ fontWeight: 900 }}>
-              House of Futbol
+              House of Fútbol
             </Typography>
           </Box>
 
@@ -45,7 +45,7 @@ export default function Footer() {
         </Stack>
 
         <Typography variant="body2" color="text.disabled" sx={{ mt: 4, textAlign: 'center' }}>
-          © {new Date().getFullYear()} House of Futbol. All rights reserved.
+          © {new Date().getFullYear()} House of Fútbol. All rights reserved.
         </Typography>
       </Container>
     </Box>

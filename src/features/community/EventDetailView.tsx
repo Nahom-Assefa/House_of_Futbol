@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box, Container, Typography, Chip, Button, Stack,
   Paper, Divider, Avatar, Grid2 as Grid,
+  Accordion, AccordionSummary, AccordionDetails,
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
@@ -11,9 +12,13 @@ import TvIcon from '@mui/icons-material/Tv'
 import GroupsIcon from '@mui/icons-material/Groups'
 import DirectionsRunIcon from '@mui/icons-material/DirectionsRun'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects'
 import type { EventType } from '../../types'
 import { useEvents } from '../../context/EventsContext'
 import { getEventStatus } from '../../utils/eventStatus'
+import { GTK_ICONS } from '../../utils/gtkIcons'
 
 const eventTypeLabel: Record<EventType, string> = {
   gaming: 'Gaming',
@@ -37,6 +42,14 @@ const eventTypeIcon: Record<EventType, React.ReactNode> = {
   community: <GroupsIcon sx={{ fontSize: 64, opacity: 0.15 }} />,
   pick_up: <DirectionsRunIcon sx={{ fontSize: 64, opacity: 0.15 }} />,
   other: <EmojiEventsIcon sx={{ fontSize: 64, opacity: 0.15 }} />,
+}
+
+const eventTypeIconSmall: Record<EventType, React.ReactNode> = {
+  gaming: <SportsSoccerIcon sx={{ fontSize: 20, color: 'primary.main' }} />,
+  watch_party: <TvIcon sx={{ fontSize: 20, color: 'primary.main' }} />,
+  community: <GroupsIcon sx={{ fontSize: 20, color: 'primary.main' }} />,
+  pick_up: <DirectionsRunIcon sx={{ fontSize: 20, color: 'primary.main' }} />,
+  other: <EmojiEventsIcon sx={{ fontSize: 20, color: 'primary.main' }} />,
 }
 
 export default function EventDetailView() {
@@ -135,6 +148,7 @@ export default function EventDetailView() {
                 elevation={0}
                 sx={{ p: { xs: 3, md: 4 }, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}
               >
+                {/* About */}
                 <Typography variant="h6" fontWeight={600} mb={1.5}>
                   About this event
                 </Typography>
@@ -143,26 +157,117 @@ export default function EventDetailView() {
                   {event.description || 'No description provided.'}
                 </Typography>
 
+                {/* Overview */}
+                <Box sx={{ mt: 5 }}>
+                  <Typography variant="h6" fontWeight={600} mb={1.5} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <EmojiEventsIcon sx={{ color: 'secondary.main', fontSize: 22 }} />
+                    Overview
+                  </Typography>
+                  <Divider sx={{ mb: 2.5 }} />
+                  <Grid container spacing={2}>
+                    {[
+                      { icon: <CalendarMonthIcon sx={{ fontSize: 20, color: 'primary.main' }} />, label: 'Date', value: event.time ? `${formattedDate} · ${event.time}` : formattedDate },
+                      { icon: <LocationOnIcon sx={{ fontSize: 20, color: 'primary.main' }} />, label: 'Location', value: event.location || 'TBD' },
+                      { icon: eventTypeIconSmall[event.event_type], label: 'Type', value: eventTypeLabel[event.event_type] },
+                      { icon: <CheckCircleOutlineIcon sx={{ fontSize: 20, color: color === 'success' ? 'success.main' : 'text.disabled' }} />, label: 'Status', value: status.charAt(0).toUpperCase() + status.slice(1) },
+                    ].map(({ icon, label, value }) => (
+                      <Grid size={{ xs: 12, sm: 6 }} key={label}>
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
+                          {icon}
+                          <Box>
+                            <Typography variant="caption" color="text.disabled" sx={{ fontWeight: 600, letterSpacing: 0.8, textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                              {label}
+                            </Typography>
+                            <Typography variant="body2" fontWeight={500} sx={{ mt: 0.25 }}>
+                              {value}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+
+                {/* Good to Know */}
+                {(event.good_to_know ?? []).length > 0 && (
+                  <Box sx={{ mt: 5 }}>
+                    <Typography variant="h6" fontWeight={600} mb={1.5} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <EmojiObjectsIcon sx={{ color: 'warning.main', fontSize: 22 }} />
+                      Good to Know
+                    </Typography>
+                    <Divider sx={{ mb: 2.5 }} />
+                    <Stack gap={1.5}>
+                      {(event.good_to_know ?? []).map((item, idx) => (
+                        <Box
+                          key={idx}
+                          sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, p: 2, bgcolor: 'action.hover', borderRadius: 2 }}
+                        >
+                          {GTK_ICONS[item.icon]?.node ?? <CheckCircleOutlineIcon sx={{ fontSize: 20, flexShrink: 0 }} />}
+                          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                            {item.text}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </Box>
+                )}
+
+                {/* Location */}
                 {event.location && (
                   <Box sx={{ mt: 5 }}>
                     <Typography variant="h6" fontWeight={600} mb={1.5} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <LocationOnIcon sx={{ color: 'primary.main', fontSize: 22 }} />
+                      <LocationOnIcon sx={{ color: 'error.main', fontSize: 22 }} />
                       Location
                     </Typography>
                     <Divider sx={{ mb: 2.5 }} />
-                    <Box
-                      sx={{
-                        p: 2.5,
-                        bgcolor: 'action.hover',
-                        borderRadius: 2,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1.5,
-                      }}
-                    >
-                      <LocationOnIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                      <LocationOnIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
                       <Typography variant="body2" fontWeight={500}>{event.location}</Typography>
                     </Box>
+                    <Box sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+                      <iframe
+                        src={`https://maps.google.com/maps?q=${encodeURIComponent(event.location)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                        width="100%"
+                        height="260"
+                        style={{ border: 0, display: 'block' }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Event location"
+                      />
+                    </Box>
+                  </Box>
+                )}
+
+                {/* FAQ */}
+                {(event.faqs ?? []).length > 0 && (
+                  <Box sx={{ mt: 5 }}>
+                    <Typography variant="h6" fontWeight={600} mb={1.5}>
+                      Frequently Asked Questions
+                    </Typography>
+                    <Divider sx={{ mb: 2.5 }} />
+                    {(event.faqs ?? []).map((faq, idx) => (
+                      <Accordion
+                        key={idx}
+                        elevation={0}
+                        disableGutters
+                        sx={{
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: '8px !important',
+                          mb: 1.5,
+                          '&:before': { display: 'none' },
+                          '&.Mui-expanded': { borderColor: 'primary.main' },
+                        }}
+                      >
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 2.5 }}>
+                          <Typography variant="body2" fontWeight={600}>{faq.q}</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails sx={{ px: 2.5, pt: 0 }}>
+                          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8 }}>{faq.a}</Typography>
+                        </AccordionDetails>
+                      </Accordion>
+                    ))}
                   </Box>
                 )}
               </Paper>
@@ -187,34 +292,30 @@ export default function EventDetailView() {
                   fullWidth
                   size="large"
                   sx={{ py: 1.5, fontSize: '1rem', mb: 3, borderRadius: 1.5 }}
+                  onClick={() => navigate(`/community/${id}/rsvp`)}
                 >
                   RSVP — It's Free
                 </Button>
 
                 <Stack gap={3}>
                   <Box>
-                    <Typography
-                      variant="overline"
-                      color="text.disabled"
-                      sx={{ letterSpacing: 1.2, fontSize: '0.68rem', fontWeight: 600 }}
-                    >
+                    <Typography variant="overline" color="text.disabled" sx={{ letterSpacing: 1.2, fontSize: '0.68rem', fontWeight: 600 }}>
                       Date & Time
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 0.75 }}>
                       <CalendarMonthIcon sx={{ fontSize: 18, color: 'text.secondary', mt: 0.15 }} />
                       <Box>
                         <Typography variant="body2" fontWeight={500}>{formattedDate}</Typography>
+                        {event.time && (
+                          <Typography variant="caption" color="text.secondary">{event.time}</Typography>
+                        )}
                       </Box>
                     </Box>
                   </Box>
 
                   {event.location && (
                     <Box>
-                      <Typography
-                        variant="overline"
-                        color="text.disabled"
-                        sx={{ letterSpacing: 1.2, fontSize: '0.68rem', fontWeight: 600 }}
-                      >
+                      <Typography variant="overline" color="text.disabled" sx={{ letterSpacing: 1.2, fontSize: '0.68rem', fontWeight: 600 }}>
                         Location
                       </Typography>
                       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 0.75 }}>
@@ -227,19 +328,13 @@ export default function EventDetailView() {
                   <Divider />
 
                   <Box>
-                    <Typography
-                      variant="overline"
-                      color="text.disabled"
-                      sx={{ letterSpacing: 1.2, fontSize: '0.68rem', fontWeight: 600 }}
-                    >
+                    <Typography variant="overline" color="text.disabled" sx={{ letterSpacing: 1.2, fontSize: '0.68rem', fontWeight: 600 }}>
                       Organized by
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.75 }}>
-                      <Avatar sx={{ width: 30, height: 30, bgcolor: 'primary.main', fontSize: 13, fontWeight: 700 }}>
-                        H
-                      </Avatar>
+                      <Avatar sx={{ width: 30, height: 30, bgcolor: 'primary.main', fontSize: 13, fontWeight: 700 }}>H</Avatar>
                       <Box>
-                        <Typography variant="body2" fontWeight={600}>House of Futbol</Typography>
+                        <Typography variant="body2" fontWeight={600}>House of Fútbol</Typography>
                         <Typography variant="caption" color="text.secondary">Twin Cities</Typography>
                       </Box>
                     </Box>

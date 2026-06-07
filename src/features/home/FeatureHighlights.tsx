@@ -23,7 +23,7 @@ const features = [
   {
     icon: <GroupsIcon sx={{ fontSize: 40, color: 'secondary.main' }} />,
     title: 'Community',
-    description: 'A home for the African diaspora in Minneapolis. Connect, compete, and build.',
+    description: 'A home for the diaspora in Minneapolis. Connect, compete, and build.',
   },
 ]
 
@@ -35,7 +35,7 @@ export default function FeatureHighlights() {
           variant="h2"
           sx={{ textAlign: 'center', mb: 2, fontSize: { xs: '1.8rem', md: '2.5rem' } }}
         >
-          Everything Football
+          Everything 4 Footballers
         </Typography>
         <Typography
           variant="body1"

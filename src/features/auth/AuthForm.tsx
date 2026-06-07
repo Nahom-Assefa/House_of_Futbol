@@ -25,7 +25,7 @@ export default function AuthForm() {
       <Container maxWidth="sm">
         <Box sx={{ textAlign: 'center', mb: 4 }}>
           <SportsSoccerIcon sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
-          <Typography variant="h4">House of Futbol</Typography>
+          <Typography variant="h4">House of Fútbol</Typography>
           <Typography variant="body2" color="text.secondary" mt={1}>
             Sign in to register for tournaments and RSVP to events
           </Typography>
