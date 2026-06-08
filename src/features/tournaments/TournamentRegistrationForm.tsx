@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box, Container, Typography, Button, Paper, TextField,
@@ -8,8 +8,10 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import BlockIcon from '@mui/icons-material/Block'
 import { useTournaments } from '../../context/TournamentsContext'
 import { useRegistration } from '../../context/RegistrationContext'
+import { supabase } from '../../lib/supabase'
 
 interface FormState {
   firstName: string
@@ -38,6 +40,17 @@ export default function TournamentRegistrationForm() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [atCapacity, setAtCapacity] = useState(false)
+
+  useEffect(() => {
+    const tournamentId = tournament?.id
+    const maxPlayers = tournament?.max_players
+    if (!tournamentId || !maxPlayers) return
+    supabase.rpc('get_tournament_registration_count', { p_tournament_id: tournamentId })
+      .then(({ data }) => {
+        if (typeof data === 'number' && data >= maxPlayers) setAtCapacity(true)
+      })
+  }, [tournament?.id])
 
   if (!tournament) {
     return (
@@ -91,6 +104,11 @@ export default function TournamentRegistrationForm() {
     setSubmitting(true)
     setSubmitError(null)
     try {
+      const { data: count } = await supabase.rpc('get_tournament_registration_count', { p_tournament_id: id! })
+      if (typeof count === 'number' && count >= (tournament?.max_players ?? Infinity)) {
+        setAtCapacity(true)
+        return
+      }
       await submitRegistration({
         tournament_id: id!,
         first_name: form.firstName,
@@ -106,6 +124,33 @@ export default function TournamentRegistrationForm() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  if (atCapacity) {
+    return (
+      <Box sx={{ bgcolor: 'background.default', minHeight: '60vh', display: 'flex', alignItems: 'center' }}>
+        <Container maxWidth="sm">
+          <Paper
+            elevation={0}
+            sx={{ p: { xs: 4, md: 5 }, borderRadius: 3, border: '1px solid', borderColor: 'divider', textAlign: 'center' }}
+          >
+            <BlockIcon sx={{ fontSize: 64, color: 'error.main', mb: 2 }} />
+            <Typography variant="h5" fontWeight={700} mb={1}>This tournament is full</Typography>
+            <Typography color="text.secondary" mb={4}>
+              <strong>{tournament.name}</strong> has reached maximum capacity of {tournament.max_players} players. Registration is now closed.
+            </Typography>
+            <Stack direction="row" gap={2} justifyContent="center">
+              <Button variant="outlined" onClick={() => navigate(`/tournaments/${id}`)}>
+                Back to Tournament
+              </Button>
+              <Button variant="contained" onClick={() => navigate('/tournaments')}>
+                Browse More
+              </Button>
+            </Stack>
+          </Paper>
+        </Container>
+      </Box>
+    )
   }
 
   if (submitted) {

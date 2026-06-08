@@ -63,6 +63,7 @@ export default function EventForm({ editingEvent, onCancelEdit }: Props) {
   const { addEvent, updateEvent } = useEvents()
   const [form, setForm] = useState(EMPTY_FORM)
   const [date, setDate] = useState<Dayjs | null>(null)
+  const [maxAttendees, setMaxAttendees] = useState<number | null>(null)
   const [goodToKnow, setGoodToKnow] = useState<GoodToKnowItem[]>([])
   const [faqs, setFaqs] = useState<FaqItem[]>([])
   const [draftGTK, setDraftGTK] = useState(EMPTY_DRAFT_GTK)
@@ -81,11 +82,13 @@ export default function EventForm({ editingEvent, onCancelEdit }: Props) {
         time: editingEvent.time ?? '',
       })
       setDate(dayjs(editingEvent.date + 'T00:00:00'))
+      setMaxAttendees(editingEvent.max_attendees ?? null)
       setGoodToKnow(editingEvent.good_to_know ?? [])
       setFaqs(editingEvent.faqs ?? [])
     } else {
       setForm(EMPTY_FORM)
       setDate(null)
+      setMaxAttendees(null)
       setGoodToKnow([])
       setFaqs([])
     }
@@ -128,6 +131,7 @@ export default function EventForm({ editingEvent, onCancelEdit }: Props) {
       date: date!.format('YYYY-MM-DD'),
       time: form.time.trim() || null,
       location: form.location.trim() || null,
+      max_attendees: maxAttendees,
       good_to_know: goodToKnow,
       faqs,
     }
@@ -138,6 +142,7 @@ export default function EventForm({ editingEvent, onCancelEdit }: Props) {
       await addEvent(payload)
       setForm(EMPTY_FORM)
       setDate(null)
+      setMaxAttendees(null)
       setGoodToKnow([])
       setFaqs([])
       setDraftGTK(EMPTY_DRAFT_GTK)
@@ -149,6 +154,7 @@ export default function EventForm({ editingEvent, onCancelEdit }: Props) {
   function handleCancel() {
     setForm(EMPTY_FORM)
     setDate(null)
+    setMaxAttendees(null)
     setGoodToKnow([])
     setFaqs([])
     setDraftGTK(EMPTY_DRAFT_GTK)
@@ -205,6 +211,20 @@ export default function EventForm({ editingEvent, onCancelEdit }: Props) {
           fullWidth
           placeholder="e.g. 7:00 PM or 6:00 PM – 9:00 PM"
           helperText="Shown in the Overview and sidebar on the event page"
+        />
+
+        <TextField
+          label="Max Attendees"
+          type="number"
+          value={maxAttendees ?? ''}
+          onChange={(e) => {
+            const val = e.target.value
+            setMaxAttendees(val === '' ? null : Math.max(1, parseInt(val) || 1))
+          }}
+          fullWidth
+          placeholder="Leave blank for no limit"
+          slotProps={{ htmlInput: { min: 1 } }}
+          helperText="Shown publicly — users will see a capacity error when the event fills up"
         />
 
         {/* Location */}

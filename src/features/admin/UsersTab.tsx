@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
   Box, Paper, Typography, Divider, Stack, Chip,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
@@ -69,10 +70,15 @@ function formatTime(iso: string) {
 }
 
 export default function UsersTab() {
-  const { rsvps, loading: rsvpLoading } = useRsvp()
-  const { registrations, loading: regLoading } = useRegistration()
+  const { rsvps, loading: rsvpLoading, refetch: refetchRsvps } = useRsvp()
+  const { registrations, loading: regLoading, refetch: refetchRegistrations } = useRegistration()
   const { events } = useEvents()
   const { tournaments } = useTournaments()
+
+  useEffect(() => {
+    refetchRsvps()
+    refetchRegistrations()
+  }, [])
 
   const loading = rsvpLoading || regLoading
 

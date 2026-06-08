@@ -15,6 +15,7 @@ interface SubmitRsvpPayload {
 interface RsvpContextValue {
   rsvps: EventRsvp[]
   loading: boolean
+  refetch: () => Promise<void>
   submitRsvp: (payload: SubmitRsvpPayload) => Promise<void>
 }
 
@@ -24,18 +25,18 @@ export function RsvpProvider({ children }: { children: ReactNode }) {
   const [rsvps, setRsvps] = useState<EventRsvp[]>([])
   const [loading, setLoading] = useState(true)
 
+  async function fetchRsvps() {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
+    const { data } = await supabase
+      .from('event_rsvps')
+      .select('*')
+      .order('rsvp_at', { ascending: false })
+    if (data) setRsvps(data as EventRsvp[])
+  }
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { setLoading(false); return }
-      supabase
-        .from('event_rsvps')
-        .select('*')
-        .order('rsvp_at', { ascending: false })
-        .then(({ data }) => {
-          if (data) setRsvps(data as EventRsvp[])
-          setLoading(false)
-        })
-    })
+    fetchRsvps().then(() => setLoading(false))
   }, [])
 
   async function submitRsvp(payload: SubmitRsvpPayload) {
@@ -46,7 +47,7 @@ export function RsvpProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <RsvpContext.Provider value={{ rsvps, loading, submitRsvp }}>
+    <RsvpContext.Provider value={{ rsvps, loading, refetch: fetchRsvps, submitRsvp }}>
       {children}
     </RsvpContext.Provider>
   )

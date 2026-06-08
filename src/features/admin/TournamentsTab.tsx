@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Box, Paper, Typography, Divider,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
@@ -31,8 +31,10 @@ const STATUS_COLOR: Record<TournamentStatus, 'success' | 'warning' | 'default'> 
 }
 
 export default function TournamentsTab() {
-  const { tournaments, deleteTournament } = useTournaments()
+  const { tournaments, deleteTournament, refetch } = useTournaments()
   const [editingTournament, setEditingTournament] = useState<Tournament | null>(null)
+
+  useEffect(() => { refetch() }, [])
 
   return (
     <Box>

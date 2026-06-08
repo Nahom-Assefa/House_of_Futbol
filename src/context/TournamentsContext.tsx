@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 interface TournamentsContextValue {
   tournaments: Tournament[]
   loading: boolean
+  refetch: () => Promise<void>
   addTournament: (data: Omit<Tournament, 'id' | 'created_at'>) => Promise<void>
   updateTournament: (id: string, data: Omit<Tournament, 'id' | 'created_at'>) => Promise<void>
   deleteTournament: (id: string) => Promise<void>
@@ -17,15 +18,13 @@ export function TournamentsProvider({ children }: { children: ReactNode }) {
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [loading, setLoading] = useState(true)
 
+  async function fetchTournaments() {
+    const { data } = await supabase.from('tournaments').select('*').order('date', { ascending: true })
+    if (data) setTournaments(data as Tournament[])
+  }
+
   useEffect(() => {
-    supabase
-      .from('tournaments')
-      .select('*')
-      .order('date', { ascending: true })
-      .then(({ data }) => {
-        if (data) setTournaments(data as Tournament[])
-        setLoading(false)
-      })
+    fetchTournaments().then(() => setLoading(false))
   }, [])
 
   async function addTournament(data: Omit<Tournament, 'id' | 'created_at'>) {
@@ -57,7 +56,7 @@ export function TournamentsProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <TournamentsContext.Provider value={{ tournaments, loading, addTournament, updateTournament, deleteTournament }}>
+    <TournamentsContext.Provider value={{ tournaments, loading, refetch: fetchTournaments, addTournament, updateTournament, deleteTournament }}>
       {children}
     </TournamentsContext.Provider>
   )

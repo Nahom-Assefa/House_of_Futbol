@@ -57,6 +57,7 @@ export interface ClubEvent {
   date: string
   time: string | null
   location: string | null
+  max_attendees: number | null
   good_to_know: GoodToKnowItem[]
   faqs: FaqItem[]
   created_at: string

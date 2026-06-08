@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 interface EventsContextValue {
   events: ClubEvent[]
   loading: boolean
+  refetch: () => Promise<void>
   addEvent: (data: Omit<ClubEvent, 'id' | 'created_at'>) => Promise<void>
   updateEvent: (id: string, data: Omit<ClubEvent, 'id' | 'created_at'>) => Promise<void>
   deleteEvent: (id: string) => Promise<void>
@@ -17,15 +18,13 @@ export function EventsProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<ClubEvent[]>([])
   const [loading, setLoading] = useState(true)
 
+  async function fetchEvents() {
+    const { data } = await supabase.from('events').select('*').order('date', { ascending: true })
+    if (data) setEvents(data as ClubEvent[])
+  }
+
   useEffect(() => {
-    supabase
-      .from('events')
-      .select('*')
-      .order('date', { ascending: true })
-      .then(({ data }) => {
-        if (data) setEvents(data as ClubEvent[])
-        setLoading(false)
-      })
+    fetchEvents().then(() => setLoading(false))
   }, [])
 
   async function addEvent(data: Omit<ClubEvent, 'id' | 'created_at'>) {
@@ -55,7 +54,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <EventsContext.Provider value={{ events, loading, addEvent, updateEvent, deleteEvent }}>
+    <EventsContext.Provider value={{ events, loading, refetch: fetchEvents, addEvent, updateEvent, deleteEvent }}>
       {children}
     </EventsContext.Provider>
   )

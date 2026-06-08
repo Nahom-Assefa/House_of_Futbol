@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box, Container, Typography, Button, Paper, TextField,
@@ -8,8 +8,10 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import BlockIcon from '@mui/icons-material/Block'
 import { useEvents } from '../../context/EventsContext'
 import { useRsvp } from '../../context/RsvpContext'
+import { supabase } from '../../lib/supabase'
 import type { EventType } from '../../types'
 
 const eventTypeLabel: Record<EventType, string> = {
@@ -51,6 +53,17 @@ export default function EventRsvpForm() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [atCapacity, setAtCapacity] = useState(false)
+
+  useEffect(() => {
+    const maxAttendees = event?.max_attendees
+    const eventId = event?.id
+    if (!maxAttendees || !eventId) return
+    supabase.rpc('get_event_rsvp_count', { p_event_id: eventId })
+      .then(({ data }) => {
+        if (typeof data === 'number' && data >= maxAttendees) setAtCapacity(true)
+      })
+  }, [event?.id])
 
   if (!event) {
     return (
@@ -101,6 +114,13 @@ export default function EventRsvpForm() {
     setSubmitting(true)
     setSubmitError(null)
     try {
+      if (event?.max_attendees != null) {
+        const { data: count } = await supabase.rpc('get_event_rsvp_count', { p_event_id: id! })
+        if (typeof count === 'number' && count >= event.max_attendees) {
+          setAtCapacity(true)
+          return
+        }
+      }
       await submitRsvp({
         event_id: id!,
         first_name: form.firstName,
@@ -115,6 +135,33 @@ export default function EventRsvpForm() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  if (atCapacity) {
+    return (
+      <Box sx={{ bgcolor: 'background.default', minHeight: '60vh', display: 'flex', alignItems: 'center' }}>
+        <Container maxWidth="sm">
+          <Paper
+            elevation={0}
+            sx={{ p: { xs: 4, md: 5 }, borderRadius: 3, border: '1px solid', borderColor: 'divider', textAlign: 'center' }}
+          >
+            <BlockIcon sx={{ fontSize: 64, color: 'error.main', mb: 2 }} />
+            <Typography variant="h5" fontWeight={700} mb={1}>This event is at capacity</Typography>
+            <Typography color="text.secondary" mb={4}>
+              <strong>{event?.title}</strong> has reached its maximum capacity of {event?.max_attendees} attendees. RSVPs are now closed.
+            </Typography>
+            <Stack direction="row" gap={2} justifyContent="center">
+              <Button variant="outlined" onClick={() => navigate(`/community/${id}`)}>
+                Back to Event
+              </Button>
+              <Button variant="contained" onClick={() => navigate('/community')}>
+                Browse More Events
+              </Button>
+            </Stack>
+          </Paper>
+        </Container>
+      </Box>
+    )
   }
 
   if (submitted) {

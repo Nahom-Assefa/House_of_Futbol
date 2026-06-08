@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Box, Paper, Typography, Divider,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
@@ -27,8 +27,10 @@ const EVENT_TYPE_COLOR: Record<EventType, 'success' | 'secondary' | 'info' | 'er
 }
 
 export default function EventsTab() {
-  const { events, deleteEvent } = useEvents()
+  const { events, deleteEvent, refetch } = useEvents()
   const [editingEvent, setEditingEvent] = useState<ClubEvent | null>(null)
+
+  useEffect(() => { refetch() }, [])
 
   return (
     <Box>

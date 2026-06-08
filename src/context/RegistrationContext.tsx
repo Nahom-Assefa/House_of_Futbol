@@ -16,6 +16,7 @@ interface SubmitRegistrationPayload {
 interface RegistrationContextValue {
   registrations: TournamentRegistration[]
   loading: boolean
+  refetch: () => Promise<void>
   submitRegistration: (payload: SubmitRegistrationPayload) => Promise<void>
 }
 
@@ -25,18 +26,18 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
   const [registrations, setRegistrations] = useState<TournamentRegistration[]>([])
   const [loading, setLoading] = useState(true)
 
+  async function fetchRegistrations() {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
+    const { data } = await supabase
+      .from('tournament_registrations')
+      .select('*')
+      .order('registered_at', { ascending: false })
+    if (data) setRegistrations(data as TournamentRegistration[])
+  }
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { setLoading(false); return }
-      supabase
-        .from('tournament_registrations')
-        .select('*')
-        .order('registered_at', { ascending: false })
-        .then(({ data }) => {
-          if (data) setRegistrations(data as TournamentRegistration[])
-          setLoading(false)
-        })
-    })
+    fetchRegistrations().then(() => setLoading(false))
   }, [])
 
   async function submitRegistration(payload: SubmitRegistrationPayload) {
@@ -47,7 +48,7 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <RegistrationContext.Provider value={{ registrations, loading, submitRegistration }}>
+    <RegistrationContext.Provider value={{ registrations, loading, refetch: fetchRegistrations, submitRegistration }}>
       {children}
     </RegistrationContext.Provider>
   )

@@ -170,6 +170,7 @@ export default function EventDetailView() {
                       { icon: <LocationOnIcon sx={{ fontSize: 20, color: 'primary.main' }} />, label: 'Location', value: event.location || 'TBD' },
                       { icon: eventTypeIconSmall[event.event_type], label: 'Type', value: eventTypeLabel[event.event_type] },
                       { icon: <CheckCircleOutlineIcon sx={{ fontSize: 20, color: color === 'success' ? 'success.main' : 'text.disabled' }} />, label: 'Status', value: status.charAt(0).toUpperCase() + status.slice(1) },
+                      ...(event.max_attendees != null ? [{ icon: <GroupsIcon sx={{ fontSize: 20, color: 'primary.main' }} />, label: 'Capacity', value: `Up to ${event.max_attendees} attendees` }] : []),
                     ].map(({ icon, label, value }) => (
                       <Grid size={{ xs: 12, sm: 6 }} key={label}>
                         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
@@ -321,6 +322,18 @@ export default function EventDetailView() {
                       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mt: 0.75 }}>
                         <LocationOnIcon sx={{ fontSize: 18, color: 'text.secondary', mt: 0.1 }} />
                         <Typography variant="body2" fontWeight={500}>{event.location}</Typography>
+                      </Box>
+                    </Box>
+                  )}
+
+                  {event.max_attendees != null && (
+                    <Box>
+                      <Typography variant="overline" color="text.disabled" sx={{ letterSpacing: 1.2, fontSize: '0.68rem', fontWeight: 600 }}>
+                        Capacity
+                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.75 }}>
+                        <GroupsIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                        <Typography variant="body2" fontWeight={500}>Up to {event.max_attendees} attendees</Typography>
                       </Box>
                     </Box>
                   )}
