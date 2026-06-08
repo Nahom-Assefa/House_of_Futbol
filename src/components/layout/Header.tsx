@@ -79,7 +79,7 @@ export default function Header() {
               >
                 Admin
               </Button>
-              <Button
+              {/* <Button
                 component={Link}
                 to="/auth"
                 variant="contained"
@@ -87,7 +87,7 @@ export default function Header() {
                 sx={{ ml: 2 }}
               >
                 Sign In
-              </Button>
+              </Button> */}
             </Box>
           )}
         </Toolbar>
@@ -116,11 +116,11 @@ export default function Header() {
                 <ListItemText primary="Admin" />
               </ListItemButton>
             </ListItem>
-            <ListItem disablePadding>
+            {/* <ListItem disablePadding>
               <ListItemButton component={Link} to="/auth" onClick={() => setDrawerOpen(false)}>
                 <ListItemText primary="Sign In" />
               </ListItemButton>
-            </ListItem>
+            </ListItem> */}
           </List>
         </Box>
       </Drawer>

@@ -1,23 +1,19 @@
 import { useState } from 'react'
 import {
   Box, Container, Paper, Typography,
-  TextField, Button, Tabs, Tab, Alert, Stack,
+  TextField, Button, /* Tabs, Tab, */ Alert, Stack,
 } from '@mui/material'
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer'
 
 export default function AuthForm() {
-  const [tab, setTab] = useState(0)
+  // const [tab, setTab] = useState(0)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState<string | null>(null)
 
   function handleSubmit() {
     // Supabase auth wired up once env vars are configured
-    setMessage(
-      tab === 0
-        ? 'Sign in coming soon — connect Supabase to enable auth.'
-        : 'Sign up coming soon — connect Supabase to enable auth.'
-    )
+    setMessage('Sign in coming soon — connect Supabase to enable auth.')
   }
 
   return (
@@ -32,10 +28,10 @@ export default function AuthForm() {
         </Box>
 
         <Paper elevation={0} sx={{ p: { xs: 3, md: 5 } }}>
-          <Tabs value={tab} onChange={(_, v) => setTab(v)} centered sx={{ mb: 4 }}>
+          {/* <Tabs value={tab} onChange={(_, v) => setTab(v)} centered sx={{ mb: 4 }}>
             <Tab label="Sign In" />
             <Tab label="Sign Up" />
-          </Tabs>
+          </Tabs> */}
 
           {message && (
             <Alert severity="info" sx={{ mb: 3 }} onClose={() => setMessage(null)}>
@@ -66,7 +62,7 @@ export default function AuthForm() {
               disabled={!email || !password}
               onClick={handleSubmit}
             >
-              {tab === 0 ? 'Sign In' : 'Create Account'}
+              Sign In
             </Button>
           </Stack>
         </Paper>
