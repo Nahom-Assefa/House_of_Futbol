@@ -41,7 +41,7 @@ const formatColor: Record<TournamentFormat, 'warning' | 'info' | 'success'> = {
 
 const formatDescription: Record<TournamentFormat, string> = {
   'single-elimination': 'Win or go home. Each match is single elimination — one loss and your run is over. The last player/team standing wins.',
-  'double-elimination': 'Two lives. Lose once and you drop to the losers bracket — fight back or you\'re done. Win that and you\'re back in the final.',
+  'double-elimination': 'Two lives. Lose once and you drop to the losers bracket — fight back or you\'re done.',
   'round-robin': 'Everyone plays everyone. Points accumulate across matches, and the top performer at the end wins the cup.',
   'group-stage': 'Teams are divided into groups. Top performers from each group advance to knockout rounds.',
 }
