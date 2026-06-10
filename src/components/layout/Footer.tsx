@@ -1,5 +1,4 @@
 import { Box, Container, Typography, Link as MuiLink, Stack } from '@mui/material'
-import SportsSoccerIcon from '@mui/icons-material/SportsSoccer'
 import { Link } from 'react-router-dom'
 
 export default function Footer() {
@@ -20,9 +19,9 @@ export default function Footer() {
           alignItems={{ xs: 'flex-start', sm: 'center' }}
           gap={3}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <SportsSoccerIcon sx={{ color: 'primary.main' }} />
-            <Typography variant="h6" sx={{ fontWeight: 900 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box component="img" src="/logo.png" alt="House of Fútbol" sx={{ height: 48, width: 48, objectFit: 'contain' }} />
+            <Typography variant="subtitle2" sx={{ fontWeight: 900 }}>
               House of Fútbol
             </Typography>
           </Box>

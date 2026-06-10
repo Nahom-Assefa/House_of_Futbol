@@ -15,7 +15,6 @@ import {
   useTheme,
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
-import SportsSoccerIcon from '@mui/icons-material/SportsSoccer'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
@@ -41,13 +40,13 @@ export default function Header() {
             to="/"
             sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none', flexGrow: 1 }}
           >
-            <SportsSoccerIcon sx={{ color: 'primary.main', fontSize: 28 }} />
+            <Box component="img" src="/logo.png" alt="House of Fútbol" sx={{ height: 40, width: 40, objectFit: 'contain' }} />
             <Typography
-              variant="h6"
+              variant="subtitle2"
               sx={{ color: 'white', fontFamily: 'Montserrat', fontWeight: 900, letterSpacing: '0.02em' }}
             >
               House of Fútbol
-            </Typography>
+            </Typography>  
           </Box>
 
           {isMobile ? (
