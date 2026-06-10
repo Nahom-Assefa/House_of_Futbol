@@ -19,12 +19,12 @@ export default function Footer() {
           alignItems={{ xs: 'flex-start', sm: 'center' }}
           gap={3}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box component="img" src="/logo.png" alt="House of Fútbol" sx={{ height: 48, width: 48, objectFit: 'contain' }} />
             <Typography variant="subtitle2" sx={{ fontWeight: 900 }}>
               House of Fútbol
             </Typography>
-          </Box>
+          </Box> */}
 
           <Stack direction="row" gap={3}>
             <MuiLink component={Link} to="/" color="text.secondary" underline="hover">
@@ -39,7 +39,7 @@ export default function Footer() {
           </Stack>
 
           <Typography variant="body2" color="text.secondary">
-            Minneapolis, MN · Twin Cities Futbol
+            Minneapolis, MN · Twin Cities Fútbol
           </Typography>
         </Stack>
 
