@@ -10,6 +10,7 @@ interface SubmitRsvpPayload {
   email: string
   phone: string
   note: string
+  sms_opt_in: boolean
 }
 
 interface RsvpContextValue {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box, Container, Typography, Button, Paper, TextField,
-  Stack, Divider, Chip, Alert,
+  Stack, Divider, Chip, Alert, FormControlLabel, Checkbox,
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
@@ -54,6 +54,7 @@ export default function EventRsvpForm() {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [atCapacity, setAtCapacity] = useState(false)
+  const [smsOptIn, setSmsOptIn] = useState(true)
 
   useEffect(() => {
     const maxAttendees = event?.max_attendees
@@ -128,6 +129,7 @@ export default function EventRsvpForm() {
         email: form.email,
         phone: form.phone,
         note: form.note,
+        sms_opt_in: smsOptIn,
       })
       setSubmitted(true)
     } catch (err) {
@@ -255,7 +257,7 @@ export default function EventRsvpForm() {
             <Divider sx={{ mb: 3 }} />
 
             <Alert severity="info" sx={{ mb: 3, borderRadius: 1.5 }}>
-              Your information is only used to confirm your attendance.
+              Your information is used to confirm your attendance.
             </Alert>
 
             <Stack gap={2.5}>
@@ -300,6 +302,22 @@ export default function EventRsvpForm() {
                 onChange={handleChange('phone')}
                 error={!!errors.phone}
                 helperText={errors.phone ?? 'For event-day reminders'}
+              />
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={smsOptIn}
+                    onChange={(e) => setSmsOptIn(e.target.checked)}
+                    size="small"
+                  />
+                }
+                label={
+                  <Typography variant="caption" color="text.secondary">
+                    I agree to receive SMS updates about this event. Message & data rates may apply. Reply STOP to opt out.
+                  </Typography>
+                }
+                sx={{ alignItems: 'flex-start', mt: 0.5 }}
               />
 
               <TextField

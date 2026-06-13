@@ -34,6 +34,7 @@ export interface TournamentRegistration {
   phone: string
   partner_name: string | null
   note: string | null
+  sms_opt_in: boolean
   registered_at: string
 }
 
@@ -71,5 +72,6 @@ export interface EventRsvp {
   email: string
   phone: string
   note: string | null
+  sms_opt_in: boolean
   rsvp_at: string
 }

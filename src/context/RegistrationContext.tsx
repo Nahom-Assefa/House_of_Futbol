@@ -11,6 +11,7 @@ interface SubmitRegistrationPayload {
   phone: string
   partner_name: string | null
   note: string
+  sms_opt_in: boolean
 }
 
 interface RegistrationContextValue {
