@@ -29,7 +29,16 @@ export default function CommunityEvents() {
   const navigate = useNavigate()
   const [filter, setFilter] = useState<EventType | 'all'>('all')
 
-  const filtered = filter === 'all' ? events : events.filter((e) => e.event_type === filter)
+  const visibleEvents = events.filter((e) => {
+    const [year, month, day] = e.date.split('-').map(Number)
+    const eventDay = new Date(year, month - 1, day)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const daysPast = Math.floor((today.getTime() - eventDay.getTime()) / 86400000)
+    return daysPast <= 3
+  })
+
+  const filtered = filter === 'all' ? visibleEvents : visibleEvents.filter((e) => e.event_type === filter)
 
   return (
     <Box sx={{ py: 8 }}>
@@ -117,9 +126,25 @@ export default function CommunityEvents() {
                         </Box>
                       )}
                     </Stack>
-                    <Button variant="outlined" color="primary" size="small" fullWidth onClick={() => navigate(`/community/${event.id}`)}>
-                      Learn More
-                    </Button>
+                    {getEventStatus(event.date).status === 'completed' ? (
+                      <Box
+                        sx={{
+                          border: '1px solid',
+                          borderColor: 'error.main',
+                          borderRadius: 1,
+                          py: 0.75,
+                          textAlign: 'center',
+                        }}
+                      >
+                        <Typography variant="body2" color="error" fontWeight={600} letterSpacing={1}>
+                          Concluded
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Button variant="outlined" color="primary" size="small" fullWidth onClick={() => navigate(`/community/${event.id}`)}>
+                        Learn More
+                      </Button>
+                    )}
                   </Box>
                 </Paper>
               </Grid>

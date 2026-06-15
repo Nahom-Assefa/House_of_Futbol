@@ -46,7 +46,14 @@ export default function TournamentsList() {
           <Typography color="text.secondary">No tournaments yet.</Typography>
         ) : (
         <Grid container spacing={3}>
-          {tournaments.map((t) => (
+          {tournaments.filter((t) => {
+            const [year, month, day] = t.date.split('-').map(Number)
+            const eventDay = new Date(year, month - 1, day)
+            const today = new Date()
+            today.setHours(0, 0, 0, 0)
+            const daysPast = Math.floor((today.getTime() - eventDay.getTime()) / 86400000)
+            return daysPast <= 3
+          }).map((t) => (
             <Grid size={{ xs: 12, md: 6 }} key={t.id}>
               <Paper
                 elevation={0}
@@ -97,9 +104,27 @@ export default function TournamentsList() {
                   </Box>
                 </Stack>
 
-                <Button variant="contained" color="primary" size="small" sx={{ alignSelf: 'flex-start', mt: 1 }} onClick={() => navigate(`/tournaments/${t.id}`)}>
-                  Learn More
-                </Button>
+                {getEventStatus(t.date).status === 'completed' ? (
+                  <Box
+                    sx={{
+                      border: '1px solid',
+                      borderColor: 'error.main',
+                      borderRadius: 1,
+                      py: 0.75,
+                      px: 2,
+                      alignSelf: 'flex-start',
+                      mt: 1,
+                    }}
+                  >
+                    <Typography variant="body2" color="error" fontWeight={600} letterSpacing={1}>
+                      Concluded
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Button variant="contained" color="primary" size="small" sx={{ alignSelf: 'flex-start', mt: 1 }} onClick={() => navigate(`/tournaments/${t.id}`)}>
+                    Learn More
+                  </Button>
+                )}
               </Paper>
             </Grid>
           ))}
