@@ -73,7 +73,7 @@ export default function CommunityEvents() {
             <CircularProgress />
           </Box>
         ) : filtered.length === 0 ? (
-          <Typography color="text.secondary">No events in this category yet.</Typography>
+          <Typography color="text.secondary">No upcoming events.</Typography>
         ) : (
           <Grid container spacing={3}>
             {filtered.map((event) => (
