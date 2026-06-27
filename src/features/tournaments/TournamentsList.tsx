@@ -24,6 +24,14 @@ const formatLabel: Record<TournamentFormat, string> = {
 export default function TournamentsList() {
   const { tournaments, loading } = useTournaments()
   const navigate = useNavigate()
+  const visible = tournaments.filter((t) => {
+    const [year, month, day] = t.date.split('-').map(Number)
+    const eventDay = new Date(year, month - 1, day)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const daysPast = Math.floor((today.getTime() - eventDay.getTime()) / 86400000)
+    return daysPast <= 3
+  })
 
   return (
     <Box sx={{ py: 8 }}>
@@ -42,18 +50,11 @@ export default function TournamentsList() {
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
             <CircularProgress />
           </Box>
-        ) : tournaments.length === 0 ? (
-          <Typography color="text.secondary">No tournaments yet.</Typography>
+        ) : visible.length === 0 ? (
+          <Typography color="text.secondary">No tournaments currently available. Check back soon!</Typography>
         ) : (
         <Grid container spacing={3}>
-          {tournaments.filter((t) => {
-            const [year, month, day] = t.date.split('-').map(Number)
-            const eventDay = new Date(year, month - 1, day)
-            const today = new Date()
-            today.setHours(0, 0, 0, 0)
-            const daysPast = Math.floor((today.getTime() - eventDay.getTime()) / 86400000)
-            return daysPast <= 3
-          }).map((t) => (
+          {visible.map((t) => (
             <Grid size={{ xs: 12, md: 6 }} key={t.id}>
               <Paper
                 elevation={0}
