@@ -18,6 +18,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import type { TournamentFormat } from '../../types'
 import { useTournaments } from '../../context/TournamentsContext'
 import { getEventStatus } from '../../utils/eventStatus'
+import { trackPixel } from '../../lib/pixel'
 import { GTK_ICONS } from '../../utils/gtkIcons'
 
 const statusGradient: Record<'upcoming' | 'completed', string> = {
@@ -334,7 +335,7 @@ export default function TournamentDetailView() {
                 }}
               >
                 {status === 'upcoming' ? (
-                  <Button variant="contained" color="primary" fullWidth size="large" sx={{ py: 1.5, fontSize: '1rem', mb: 3, borderRadius: 1.5 }} onClick={() => navigate(`/tournaments/${id}/register`)}>
+                  <Button variant="contained" color="primary" fullWidth size="large" sx={{ py: 1.5, fontSize: '1rem', mb: 3, borderRadius: 1.5 }} onClick={() => { trackPixel('InitiateCheckout', { content_name: tournament.name, content_category: 'Tournament Registration' }); navigate(`/tournaments/${id}/register`) }}>
                     Register Now
                   </Button>
                 ) : (

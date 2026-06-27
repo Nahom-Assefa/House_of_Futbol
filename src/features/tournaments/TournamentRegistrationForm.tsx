@@ -11,6 +11,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import BlockIcon from '@mui/icons-material/Block'
 import { useTournaments } from '../../context/TournamentsContext'
 import { useRegistration } from '../../context/RegistrationContext'
+import { trackPixel } from '../../lib/pixel'
 import { supabase } from '../../lib/supabase'
 
 interface FormState {
@@ -120,6 +121,7 @@ export default function TournamentRegistrationForm() {
         note: form.note,
         sms_opt_in: smsOptIn,
       })
+      trackPixel('Lead', { content_name: tournament?.name, content_category: 'Tournament Registration' })
       setSubmitted(true)
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')

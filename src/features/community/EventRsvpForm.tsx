@@ -11,6 +11,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import BlockIcon from '@mui/icons-material/Block'
 import { useEvents } from '../../context/EventsContext'
 import { useRsvp } from '../../context/RsvpContext'
+import { trackPixel } from '../../lib/pixel'
 import { supabase } from '../../lib/supabase'
 import type { EventType } from '../../types'
 
@@ -131,6 +132,7 @@ export default function EventRsvpForm() {
         note: form.note,
         sms_opt_in: smsOptIn,
       })
+      trackPixel('Lead', { content_name: event?.title, content_category: 'Event RSVP' })
       setSubmitted(true)
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')

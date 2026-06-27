@@ -17,6 +17,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects'
 import type { EventType } from '../../types'
 import { useEvents } from '../../context/EventsContext'
+import { trackPixel } from '../../lib/pixel'
 import { getEventStatus } from '../../utils/eventStatus'
 import { GTK_ICONS } from '../../utils/gtkIcons'
 
@@ -293,9 +294,9 @@ export default function EventDetailView() {
                   fullWidth
                   size="large"
                   sx={{ py: 1.5, fontSize: '1rem', mb: 3, borderRadius: 1.5 }}
-                  onClick={() => navigate(`/community/${id}/rsvp`)}
+                  onClick={() => { trackPixel('InitiateCheckout', { content_name: event.title, content_category: 'Event RSVP' }); navigate(`/community/${id}/rsvp`) }}
                 >
-                  RSVP — It's Free
+                  RSVP
                 </Button>
 
                 <Stack gap={3}>
