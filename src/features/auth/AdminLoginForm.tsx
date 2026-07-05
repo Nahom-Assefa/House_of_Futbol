@@ -43,7 +43,7 @@ export default function AdminLoginForm() {
           <AdminPanelSettingsIcon sx={{ fontSize: 52, color: 'secondary.main', mb: 1 }} />
           <Typography variant="h5" fontWeight={700}>Admin Portal</Typography>
           <Typography variant="body2" color="text.secondary" mt={1}>
-            House of Fútbol · Staff only
+            House of Fútbol · Admin and Captains only
           </Typography>
         </Box>
 

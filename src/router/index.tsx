@@ -9,6 +9,7 @@ import EventDetailView from '../features/community/EventDetailView'
 import EventRsvpForm from '../features/community/EventRsvpForm'
 import AuthForm from '../features/auth/AuthForm'
 import AdminLoginForm from '../features/auth/AdminLoginForm'
+import CaptainApplicationForm from '../features/captain/CaptainApplicationForm'
 import AdminDashboard from '../features/admin/AdminDashboard'
 import ProtectedRoute from '../components/auth/ProtectedRoute'
 
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
       { path: 'community/:id', element: <EventDetailView /> },
       { path: 'community/:id/rsvp', element: <EventRsvpForm /> },
       { path: 'auth', element: <AuthForm /> },
+      { path: 'become-a-captain', element: <CaptainApplicationForm /> },
       { path: 'admin/login', element: <AdminLoginForm /> },
       {
         path: 'admin',

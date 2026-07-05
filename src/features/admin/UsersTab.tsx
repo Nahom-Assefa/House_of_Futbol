@@ -12,6 +12,7 @@ import { useRsvp } from '../../context/RsvpContext'
 import { useRegistration } from '../../context/RegistrationContext'
 import { useEvents } from '../../context/EventsContext'
 import { useTournaments } from '../../context/TournamentsContext'
+import { useAuth } from '../../context/AuthContext'
 import type { EventType } from '../../types'
 
 const EVENT_TYPE_LABEL: Record<EventType, string> = {
@@ -72,8 +73,9 @@ function formatTime(iso: string) {
 export default function UsersTab() {
   const { rsvps, loading: rsvpLoading, refetch: refetchRsvps } = useRsvp()
   const { registrations, loading: regLoading, refetch: refetchRegistrations } = useRegistration()
-  const { events } = useEvents()
-  const { tournaments } = useTournaments()
+  const { myEvents } = useEvents()
+  const { myTournaments } = useTournaments()
+  const { isCaptain } = useAuth()
 
   useEffect(() => {
     refetchRsvps()
@@ -82,11 +84,14 @@ export default function UsersTab() {
 
   const loading = rsvpLoading || regLoading
 
-  const eventMap = Object.fromEntries(events.map((e) => [e.id, e]))
-  const tournamentMap = Object.fromEntries(tournaments.map((t) => [t.id, t]))
+  const eventMap = Object.fromEntries(myEvents.map((e) => [e.id, e]))
+  const tournamentMap = Object.fromEntries(myTournaments.map((t) => [t.id, t]))
+
+  const visibleRsvps = isCaptain ? rsvps.filter((r) => eventMap[r.event_id]) : rsvps
+  const visibleRegistrations = isCaptain ? registrations.filter((r) => tournamentMap[r.tournament_id]) : registrations
 
   const rows: SubmissionRow[] = [
-    ...rsvps.map((r) => {
+    ...visibleRsvps.map((r) => {
       const event = eventMap[r.event_id]
       return {
         id: r.id,
@@ -109,7 +114,7 @@ export default function UsersTab() {
         note: r.note,
       }
     }),
-    ...registrations.map((r) => {
+    ...visibleRegistrations.map((r) => {
       const t = tournamentMap[r.tournament_id]
       return {
         id: r.id,

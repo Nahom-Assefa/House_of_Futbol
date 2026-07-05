@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box, Container, Typography, Chip, Button, Stack,
@@ -18,6 +19,7 @@ import EmojiObjectsIcon from '@mui/icons-material/EmojiObjects'
 import type { EventType } from '../../types'
 import { useEvents } from '../../context/EventsContext'
 import { trackPixel } from '../../lib/pixel'
+import { supabase } from '../../lib/supabase'
 import { getEventStatus } from '../../utils/eventStatus'
 import { GTK_ICONS } from '../../utils/gtkIcons'
 
@@ -57,8 +59,15 @@ export default function EventDetailView() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { events } = useEvents()
+  const [creatorName, setCreatorName] = useState<string | null>(null)
 
   const event = events.find((e) => e.id === id)
+
+  useEffect(() => {
+    if (!event?.creator_id) return
+    supabase.from('profiles').select('display_name').eq('id', event.creator_id).single()
+      .then(({ data }) => setCreatorName(data?.display_name ?? null))
+  }, [event?.creator_id])
 
   if (!event) {
     return (
@@ -346,9 +355,11 @@ export default function EventDetailView() {
                       Organized by
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.75 }}>
-                      <Avatar sx={{ width: 30, height: 30, bgcolor: 'primary.main', fontSize: 13, fontWeight: 700 }}>H</Avatar>
+                      <Avatar sx={{ width: 30, height: 30, bgcolor: 'primary.main', fontSize: 13, fontWeight: 700 }}>
+                        {(creatorName ?? 'House of Fútbol')[0].toUpperCase()}
+                      </Avatar>
                       <Box>
-                        <Typography variant="body2" fontWeight={600}>House of Fútbol</Typography>
+                        <Typography variant="body2" fontWeight={600}>{creatorName ?? 'House of Fútbol'}</Typography>
                         <Typography variant="caption" color="text.secondary">Twin Cities</Typography>
                       </Box>
                     </Box>

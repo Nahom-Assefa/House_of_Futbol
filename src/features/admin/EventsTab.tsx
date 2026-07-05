@@ -8,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import EventForm from './EventForm'
 import { useEvents } from '../../context/EventsContext'
+import { useAuth } from '../../context/AuthContext'
 import type { ClubEvent, EventType } from '../../types'
 
 const EVENT_TYPE_LABEL: Record<EventType, string> = {
@@ -27,10 +28,13 @@ const EVENT_TYPE_COLOR: Record<EventType, 'success' | 'secondary' | 'info' | 'er
 }
 
 export default function EventsTab() {
-  const { events, deleteEvent, refetch } = useEvents()
+  const { myEvents, deleteEvent, refetch } = useEvents()
+  const { isAdmin, isCaptain } = useAuth()
   const [editingEvent, setEditingEvent] = useState<ClubEvent | null>(null)
 
   useEffect(() => { refetch() }, [])
+
+  const label = isAdmin ? 'All Events' : 'My Events'
 
   return (
     <Box>
@@ -43,10 +47,12 @@ export default function EventsTab() {
 
       <Divider sx={{ mb: 4, borderColor: 'rgba(255,255,255,0.06)' }} />
 
-      <Typography variant="h5" mb={3}>All Events ({events.length})</Typography>
+      <Typography variant="h5" mb={3}>{label} ({myEvents.length})</Typography>
 
-      {events.length === 0 ? (
-        <Typography color="text.secondary">No events yet. Create one above.</Typography>
+      {myEvents.length === 0 ? (
+        <Typography color="text.secondary">
+          {isCaptain ? 'You haven\'t created any events yet.' : 'No events yet. Create one above.'}
+        </Typography>
       ) : (
         <TableContainer component={Paper} elevation={0}>
           <Table>
@@ -60,7 +66,7 @@ export default function EventsTab() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {events.map((event) => (
+              {myEvents.map((event) => (
                 <TableRow
                   key={event.id}
                   selected={editingEvent?.id === event.id}

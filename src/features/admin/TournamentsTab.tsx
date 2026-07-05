@@ -8,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import TournamentForm from './TournamentForm'
 import { useTournaments } from '../../context/TournamentsContext'
+import { useAuth } from '../../context/AuthContext'
 import type { Tournament, TournamentFormat, TournamentStatus } from '../../types'
 
 const FORMAT_LABEL: Record<TournamentFormat, string> = {
@@ -31,10 +32,13 @@ const STATUS_COLOR: Record<TournamentStatus, 'success' | 'warning' | 'default'> 
 }
 
 export default function TournamentsTab() {
-  const { tournaments, deleteTournament, refetch } = useTournaments()
+  const { myTournaments, deleteTournament, refetch } = useTournaments()
+  const { isAdmin, isCaptain } = useAuth()
   const [editingTournament, setEditingTournament] = useState<Tournament | null>(null)
 
   useEffect(() => { refetch() }, [])
+
+  const label = isAdmin ? 'All Tournaments' : 'My Tournaments'
 
   return (
     <Box>
@@ -47,10 +51,12 @@ export default function TournamentsTab() {
 
       <Divider sx={{ mb: 4, borderColor: 'rgba(255,255,255,0.06)' }} />
 
-      <Typography variant="h5" mb={3}>All Tournaments ({tournaments.length})</Typography>
+      <Typography variant="h5" mb={3}>{label} ({myTournaments.length})</Typography>
 
-      {tournaments.length === 0 ? (
-        <Typography color="text.secondary">No tournaments yet. Create one above.</Typography>
+      {myTournaments.length === 0 ? (
+        <Typography color="text.secondary">
+          {isCaptain ? 'You haven\'t created any tournaments yet.' : 'No tournaments yet. Create one above.'}
+        </Typography>
       ) : (
         <TableContainer component={Paper} elevation={0}>
           <Table>
@@ -66,7 +72,7 @@ export default function TournamentsTab() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {tournaments.map((t) => (
+              {myTournaments.map((t) => (
                 <TableRow
                   key={t.id}
                   selected={editingTournament?.id === t.id}

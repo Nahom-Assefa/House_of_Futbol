@@ -22,6 +22,7 @@ const navLinks = [
   { label: 'Home', path: '/' },
   { label: 'Tournaments', path: '/tournaments' },
   { label: 'Community', path: '/community' },
+  { label: 'Become a Captain', path: '/become-a-captain'}
 ]
 
 export default function Header() {

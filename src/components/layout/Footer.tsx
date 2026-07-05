@@ -36,6 +36,9 @@ export default function Footer() {
             <MuiLink component={Link} to="/community" color="text.secondary" underline="hover">
               Community
             </MuiLink>
+            <MuiLink component={Link} to="/become-a-captain" color="text.secondary" underline="hover">
+              Become a Captain
+            </MuiLink>
           </Stack>
 
           <Typography variant="body2" color="text.secondary">

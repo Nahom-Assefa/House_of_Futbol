@@ -1,8 +1,20 @@
 export interface Profile {
   id: string
-  username: string
+  username: string | null
   avatar_url: string | null
+  display_name: string | null
+  role: 'admin' | 'captain' | null
   created_at: string
+}
+
+export interface CaptainApplication {
+  id: string
+  display_name: string
+  email: string
+  message: string
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: string
+  reviewed_at: string | null
 }
 
 export type TournamentFormat = 'round-robin' | 'single-elimination' | 'double-elimination' | 'group-stage'
@@ -22,6 +34,7 @@ export interface Tournament {
   description: string | null
   good_to_know: GoodToKnowItem[]
   faqs: FaqItem[]
+  creator_id: string | null
   created_at: string
 }
 
@@ -61,6 +74,7 @@ export interface ClubEvent {
   max_attendees: number | null
   good_to_know: GoodToKnowItem[]
   faqs: FaqItem[]
+  creator_id: string | null
   created_at: string
 }
 

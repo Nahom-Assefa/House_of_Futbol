@@ -2,13 +2,15 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import type { Tournament } from '../types'
 import { supabase } from '../lib/supabase'
+import { useAuth } from './AuthContext'
 
 interface TournamentsContextValue {
   tournaments: Tournament[]
+  myTournaments: Tournament[]
   loading: boolean
   refetch: () => Promise<void>
-  addTournament: (data: Omit<Tournament, 'id' | 'created_at'>) => Promise<void>
-  updateTournament: (id: string, data: Omit<Tournament, 'id' | 'created_at'>) => Promise<void>
+  addTournament: (data: Omit<Tournament, 'id' | 'created_at' | 'creator_id'>) => Promise<void>
+  updateTournament: (id: string, data: Omit<Tournament, 'id' | 'created_at' | 'creator_id'>) => Promise<void>
   deleteTournament: (id: string) => Promise<void>
 }
 
@@ -17,6 +19,7 @@ const TournamentsContext = createContext<TournamentsContextValue | null>(null)
 export function TournamentsProvider({ children }: { children: ReactNode }) {
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [loading, setLoading] = useState(true)
+  const { isAdmin, isCaptain, profile } = useAuth()
 
   async function fetchTournaments() {
     const { data } = await supabase.from('tournaments').select('*').order('date', { ascending: true })
@@ -27,17 +30,24 @@ export function TournamentsProvider({ children }: { children: ReactNode }) {
     fetchTournaments().then(() => setLoading(false))
   }, [])
 
-  async function addTournament(data: Omit<Tournament, 'id' | 'created_at'>) {
+  const myTournaments = isAdmin
+    ? tournaments
+    : isCaptain && profile
+      ? tournaments.filter((t) => t.creator_id === profile.id)
+      : []
+
+  async function addTournament(data: Omit<Tournament, 'id' | 'created_at' | 'creator_id'>) {
+    const { data: { session } } = await supabase.auth.getSession()
     const { data: inserted, error } = await supabase
       .from('tournaments')
-      .insert(data)
+      .insert({ ...data, creator_id: session?.user.id ?? null })
       .select()
       .single()
     if (error) throw new Error(error.message)
-    if (inserted) setTournaments((prev) => [inserted as Tournament, ...prev])
+    if (inserted) setTournaments((prev) => [...prev, inserted as Tournament])
   }
 
-  async function updateTournament(id: string, data: Omit<Tournament, 'id' | 'created_at'>) {
+  async function updateTournament(id: string, data: Omit<Tournament, 'id' | 'created_at' | 'creator_id'>) {
     const { data: updated, error } = await supabase
       .from('tournaments')
       .update(data)
@@ -56,7 +66,7 @@ export function TournamentsProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <TournamentsContext.Provider value={{ tournaments, loading, refetch: fetchTournaments, addTournament, updateTournament, deleteTournament }}>
+    <TournamentsContext.Provider value={{ tournaments, myTournaments, loading, refetch: fetchTournaments, addTournament, updateTournament, deleteTournament }}>
       {children}
     </TournamentsContext.Provider>
   )

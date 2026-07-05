@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   Box, Container, Typography, Chip, Button, Stack,
@@ -18,6 +19,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import type { TournamentFormat } from '../../types'
 import { useTournaments } from '../../context/TournamentsContext'
 import { getEventStatus } from '../../utils/eventStatus'
+import { supabase } from '../../lib/supabase'
 import { trackPixel } from '../../lib/pixel'
 import { GTK_ICONS } from '../../utils/gtkIcons'
 
@@ -51,8 +53,15 @@ export default function TournamentDetailView() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { tournaments } = useTournaments()
+  const [creatorName, setCreatorName] = useState<string | null>(null)
 
   const t = tournaments.find((t) => t.id === id)
+
+  useEffect(() => {
+    if (!t?.creator_id) return
+    supabase.from('profiles').select('display_name').eq('id', t.creator_id).single()
+      .then(({ data }) => setCreatorName(data?.display_name ?? null))
+  }, [t?.creator_id])
 
   if (!t) {
     return (
@@ -384,9 +393,11 @@ export default function TournamentDetailView() {
                       Organized by
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.75 }}>
-                      <Avatar sx={{ width: 30, height: 30, bgcolor: 'secondary.main', fontSize: 13, fontWeight: 700 }}>H</Avatar>
+                      <Avatar sx={{ width: 30, height: 30, bgcolor: 'secondary.main', fontSize: 13, fontWeight: 700 }}>
+                        {(creatorName ?? 'House of Fútbol')[0].toUpperCase()}
+                      </Avatar>
                       <Box>
-                        <Typography variant="body2" fontWeight={600}>House of Fútbol</Typography>
+                        <Typography variant="body2" fontWeight={600}>{creatorName ?? 'House of Fútbol'}</Typography>
                         <Typography variant="caption" color="text.secondary">Twin Cities</Typography>
                       </Box>
                     </Box>
