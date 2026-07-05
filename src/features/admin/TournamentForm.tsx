@@ -119,7 +119,7 @@ export default function TournamentForm({ editingTournament, onCancelEdit }: Prop
   async function handleSubmit() {
     if (!isValid) return
     setError(null)
-    const payload: Omit<Tournament, 'id' | 'created_at' | 'status'> = {
+    const payload: Omit<Tournament, 'id' | 'created_at' | 'status' | 'creator_id'> = {
       name: form.name.trim(),
       description: form.description.trim() || null,
       format: form.format,

@@ -124,7 +124,7 @@ export default function EventForm({ editingEvent, onCancelEdit }: Props) {
 
   async function handleSubmit() {
     if (!isValid) return
-    const payload: Omit<ClubEvent, 'id' | 'created_at'> = {
+    const payload: Omit<ClubEvent, 'id' | 'created_at' | 'creator_id'> = {
       title: form.title.trim(),
       description: form.description.trim() || null,
       event_type: form.event_type,
