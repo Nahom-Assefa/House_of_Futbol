@@ -9,6 +9,7 @@ import EventDetailView from '../features/community/EventDetailView'
 import EventRsvpForm from '../features/community/EventRsvpForm'
 import AuthForm from '../features/auth/AuthForm'
 import AdminLoginForm from '../features/auth/AdminLoginForm'
+import SetPassword from '../features/auth/SetPassword'
 import CaptainApplicationForm from '../features/captain/CaptainApplicationForm'
 import AdminDashboard from '../features/admin/AdminDashboard'
 import ProtectedRoute from '../components/auth/ProtectedRoute'
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
       { path: 'auth', element: <AuthForm /> },
       { path: 'become-a-captain', element: <CaptainApplicationForm /> },
       { path: 'admin/login', element: <AdminLoginForm /> },
+      { path: 'set-password', element: <SetPassword /> },
       {
         path: 'admin',
         element: <ProtectedRoute><AdminDashboard /></ProtectedRoute>,
