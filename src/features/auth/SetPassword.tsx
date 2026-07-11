@@ -13,6 +13,7 @@ export default function SetPassword() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [step, setStep] = useState<Step>('verifying')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -25,11 +26,14 @@ export default function SetPassword() {
     async function verify() {
       if (tokenHash && (type === 'invite' || type === 'recovery')) {
         const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
-        setStep(error ? 'error' : 'set-password')
+        if (error) { setStep('error'); return }
       } else {
         const { data: { session } } = await supabase.auth.getSession()
-        setStep(session ? 'set-password' : 'error')
+        if (!session) { setStep('error'); return }
       }
+      const { data: { user } } = await supabase.auth.getUser()
+      setEmail(user?.email ?? '')
+      setStep('set-password')
     }
 
     verify()
@@ -40,13 +44,20 @@ export default function SetPassword() {
     if (password.length < 8) { setError('Password must be at least 8 characters.'); return }
     setSubmitting(true)
     setError(null)
-    const { error } = await supabase.auth.updateUser({ password })
-    setSubmitting(false)
-    if (error) {
-      setError(error.message)
-    } else {
-      navigate('/admin', { replace: true })
+    const { error: updateError } = await supabase.auth.updateUser({ password })
+    if (updateError) {
+      setSubmitting(false)
+      setError(updateError.message)
+      return
     }
+    await supabase.auth.signOut()
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    if (signInError) {
+      setSubmitting(false)
+      setError('Password set, but auto sign-in failed. Please log in manually.')
+      return
+    }
+    navigate('/admin', { replace: true })
   }
 
   return (
@@ -103,7 +114,7 @@ export default function SetPassword() {
                 disabled={!password || !confirm || submitting}
                 onClick={handleSubmit}
               >
-                {submitting ? 'Saving…' : 'Set Password & Enter Portal'}
+                {submitting ? 'Setting up your account…' : 'Set Password & Enter Portal'}
               </Button>
             </Stack>
           )}

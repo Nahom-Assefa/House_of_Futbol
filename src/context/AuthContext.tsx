@@ -31,9 +31,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session)
       if (session) {
+        if (event === 'TOKEN_REFRESHED') return
         setLoading(true)
         fetchProfile(session.user.id).finally(() => setLoading(false))
       } else {
