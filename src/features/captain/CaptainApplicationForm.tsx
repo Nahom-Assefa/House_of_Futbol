@@ -10,10 +10,11 @@ import { supabase } from '../../lib/supabase'
 interface FormState {
   display_name: string
   email: string
+  phone: string
   message: string
 }
 
-const emptyForm: FormState = { display_name: '', email: '', message: '' }
+const emptyForm: FormState = { display_name: '', email: '', phone: '', message: '' }
 
 export default function CaptainApplicationForm() {
   const [form, setForm] = useState<FormState>(emptyForm)
@@ -51,6 +52,7 @@ export default function CaptainApplicationForm() {
       const { error } = await supabase.from('captain_applications').insert({
         display_name: form.display_name.trim(),
         email: form.email.trim().toLowerCase(),
+        phone: form.phone.trim() || null,
         message: form.message.trim(),
       })
       if (error) throw error
@@ -140,6 +142,16 @@ export default function CaptainApplicationForm() {
                 onChange={handleChange('email')}
                 error={!!errors.email}
                 helperText={errors.email ?? 'We\'ll use this to contact you and set up your account'}
+              />
+
+              <TextField
+                label="Phone Number"
+                type="tel"
+                fullWidth
+                value={form.phone}
+                onChange={handleChange('phone')}
+                placeholder="e.g. (612) 555-0123"
+                helperText="Optional — for faster follow-up"
               />
 
               <TextField

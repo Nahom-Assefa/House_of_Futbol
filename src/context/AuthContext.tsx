@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
@@ -21,47 +21,69 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
 
-  async function fetchProfile(userId: string) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    setProfile(data ?? null)
-  }
-
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    let mounted = true
+
+    // Fast initial load from local storage — keeps loading=true until profile resolves
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return
       setSession(session)
       if (session) {
-        if (event === 'TOKEN_REFRESHED') return
+        supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle()
+          .then(({ data }) => {
+            if (!mounted) return
+            setProfile(data ?? null)
+            setLoading(false)
+          })
+      } else {
+        setLoading(false)
+      }
+    })
+
+    // Handle all subsequent auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION') return // already handled by getSession above
+      if (!mounted) return
+
+      setSession(session)
+      if (session) {
         setLoading(true)
-        fetchProfile(session.user.id).finally(() => setLoading(false))
+        supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle()
+          .then(({ data }) => {
+            if (!mounted) return
+            setProfile(data ?? null)
+            setLoading(false)
+          })
       } else {
         setProfile(null)
         setLoading(false)
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
-  async function logout() {
+  const logout = useCallback(async () => {
     await supabase.auth.signOut()
-  }
+  }, [])
 
   const role = profile?.role ?? null
 
+  const value = useMemo(() => ({
+    isAuthenticated: session !== null,
+    loading,
+    profile,
+    role,
+    isAdmin: role === 'admin',
+    isCaptain: role === 'captain',
+    logout,
+  }), [session, loading, profile, role, logout])
+
   return (
-    <AuthContext.Provider value={{
-      isAuthenticated: session !== null,
-      loading,
-      profile,
-      role,
-      isAdmin: role === 'admin',
-      isCaptain: role === 'captain',
-      logout,
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )

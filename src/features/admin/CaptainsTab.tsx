@@ -102,6 +102,7 @@ export default function CaptainsTab() {
               <TableRow>
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
+                <TableCell>Phone</TableCell>
                 <TableCell>Message</TableCell>
                 <TableCell>Applied</TableCell>
                 {filter === 'pending' && <TableCell align="right">Actions</TableCell>}
@@ -119,6 +120,9 @@ export default function CaptainsTab() {
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">{app.email}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" color="text.secondary">{app.phone ?? '—'}</Typography>
                   </TableCell>
                   <TableCell sx={{ maxWidth: 300 }}>
                     <Typography variant="body2" color="text.secondary">

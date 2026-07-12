@@ -10,15 +10,15 @@ import { useAuth } from '../../context/AuthContext'
 
 export default function AdminLoginForm() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isAdmin, isCaptain } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/admin', { replace: true })
-  }, [isAuthenticated, navigate])
+    if (isAuthenticated && (isAdmin || isCaptain)) navigate('/admin', { replace: true })
+  }, [isAuthenticated, isAdmin, isCaptain, navigate])
 
   async function handleSubmit() {
     if (!email || !password) return

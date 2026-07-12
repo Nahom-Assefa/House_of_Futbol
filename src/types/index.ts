@@ -11,6 +11,7 @@ export interface CaptainApplication {
   id: string
   display_name: string
   email: string
+  phone: string | null
   message: string
   status: 'pending' | 'approved' | 'rejected'
   created_at: string
